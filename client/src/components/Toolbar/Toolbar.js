@@ -5,6 +5,9 @@ export default class Toolbar extends Component {
             this.props.onZoomChange(e.target.value)
         }
     }
+
+    loadData = () => { console.log("Load data triggered!") }
+
     render() {
         const zoomRadios = ['Hours', 'Days', 'Months'].map((value) => {
             const isActive = this.props.zoom === value;
@@ -23,6 +26,7 @@ export default class Toolbar extends Component {
             <div className="tool-bar">
                 <b>Zooming: </b>
                     { zoomRadios }
+                <button onClick={ this.loadData }>Add data</button>
             </div>
         );
     }

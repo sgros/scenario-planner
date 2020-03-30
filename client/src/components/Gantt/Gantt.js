@@ -8,12 +8,13 @@ export default class Gantt extends Component {
         const { tasks } = this.props;
         gantt.init(this.ganttContainer);
         gantt.parse(tasks);
+        this.configSetup();
     }
 
     render() {
+        this.setColumns();
         const { zoom } = this.props;
         this.setZoom(zoom);
-        this.setColumns();
         return (
             <div
                 ref={(input) => { this.ganttContainer = input }}
@@ -75,5 +76,36 @@ export default class Gantt extends Component {
         //{name:"priority",    height:22, type:"select",   map_to:"priority", options:priority, default_value:"Low"},
         {name:"add",        label:"",           width:44 }
     ];
+    }
+
+    configSetup() {
+      gantt.config.wide_form = 1;
+      gantt.config.work_time = true;
+      gantt.config.order_branch = true;
+      gantt.config.autoscroll = true;
+      gantt.config.auto_scheduling = true;
+      gantt.config.autoscroll_speed = 100;
+      gantt.config.fit_tasks = true;
+      gantt.config.scale_unit = this.props.zoom.scale_unit;
+      gantt.config.duration_unit = "hour";
+      gantt.config.scale_height = 50;
+      gantt.config.min_column_width = 1000;
+      gantt.config.date_scale = this.props.zoom.date_scale;
+      gantt.config.open_tree_initially = true;
+      gantt.config.subscales = this.props.zoom.subscales;
+      gantt.templates.task_cell_class = function(task, date){
+        if(!gantt.isWorkTime({task:task, date: date}))
+          return "week_end";
+        return "";
+      };
+      gantt.setWorkTime({
+        hours: [9,17]
+      })
+      gantt.setWorkTime({ day:6, hours:false });
+      gantt.setWorkTime({ day:7, hours:false });
+      gantt.locale.labels["milestone"] = "Milestone";
+      gantt.config.buttons_left = ["dhx_save_btn", "dhx_cancel_btn", "milestone"];
+      gantt.config.buttons_right = ["dhx_delete_btn"];
+      //addTodayMarker();
     }
 }
