@@ -1,26 +1,31 @@
 import React, { Component } from 'react';
 import { gantt } from 'dhtmlx-gantt';
 import 'dhtmlx-gantt/codebase/dhtmlxgantt.css';
+import $ from "jquery";
+import { jQuery } from 'jquery';
+import jsonTimestamp from '../../static/config.json';
+import jsonAction from '../../static/action.json';
+import jsonStateLevelScenario from '../../static/state_level_scenario.json';
 
 export default class Gantt extends Component {
-    componentDidMount() {
+    constructor(props){
+        super(props);
+
         gantt.config.xml_date = "%Y-%m-%d %H:%i";
         const { tasks } = this.props;
         gantt.init(this.ganttContainer);
         gantt.parse(tasks);
         this.configSetup();
-    }
 
-    render() {
-        this.setColumns();
-        const { zoom } = this.props;
-        this.setZoom(zoom);
-        return (
-            <div
-                ref={(input) => { this.ganttContainer = input }}
-                style={{ width: '100%', height: '100%' }}
-            ></div>
-        );
+        var actionLabel = this.loadActions();
+        var priorityList = this.loadPriorities();
+        var playersLabel = this.loadPlayers();
+
+        this.state = {
+            priority: priorityList,
+            actionLabel: actionLabel,
+            playersLabel: playersLabel
+        }
     }
 
     setZoom(value) {
@@ -66,16 +71,53 @@ export default class Gantt extends Component {
         gantt.render();
     }
 
-    setColumns(){
-        console.log(gantt.config.columns)
+    loadActions(){
+        var actionLabel = [];
+        var keys = Object.keys(jsonAction.actions);
+        $.each(keys, function(i, val) {
+            actionLabel.push({"key": i, "label": val})
+        });
 
-        gantt.config.columns =  [
+        return actionLabel;
+    }
+
+    loadPriorities(){
+        var taskConfigText = null;
+        var jsonConfig = null;
+        var priorityList = [];
+
+        jsonConfig = jsonTimestamp;
+        $.each(jsonTimestamp.priority, function(i, val) {
+            priorityList.push({"key": i, "label": val})
+        });
+        taskConfigText = jsonTimestamp.task_text;
+        for(let r in priorityList){$('#priority').append($('<option>',{value: r,text: priorityList[r]}))}
+
+        return priorityList;
+    }
+
+    loadPlayers(){
+        var playersLabel = [];
+        var cpt = 0;
+        $.each(jsonStateLevelScenario.players, function(i, val) {
+            $.each(val.actors, function(y, val2) {
+                playersLabel.push({"key": cpt, "label": i + "." + val2.name})
+                cpt++;
+            })
+        });
+        for(let r in playersLabel){$('#holder').append($('<option>',{value: r,text: playersLabel[r]["label"]}))}
+
+        return playersLabel;
+    }
+
+    setColumns(){
+        gantt.config.columns = [
         {name:"text",       label:"Task name",  tree:true, width: 150 },
         {name:"start_date", label:"Start time", align:"center", resize: true, width: 120 },
         {name:"end_date",   label:"End date",   align:"center", resize: true, width: 120 },
-        //{name:"priority",    height:22, type:"select",   map_to:"priority", options:priority, default_value:"Low"},
+        {name:"priority",  label:"Priority", height:22, type:"select", map_to:"priority", options:this.state.priorityList, default_value:"Low"},
         {name:"add",        label:"",           width:44 }
-    ];
+        ];
     }
 
     configSetup() {
@@ -93,7 +135,7 @@ export default class Gantt extends Component {
       gantt.config.date_scale = this.props.zoom.date_scale;
       gantt.config.open_tree_initially = true;
       gantt.config.subscales = this.props.zoom.subscales;
-      gantt.templates.task_cell_class = function(task, date){
+      gantt.templates.timeline_cell_class = function(task, date){
         if(!gantt.isWorkTime({task:task, date: date}))
           return "week_end";
         return "";
@@ -108,4 +150,41 @@ export default class Gantt extends Component {
       gantt.config.buttons_right = ["dhx_delete_btn"];
       //addTodayMarker();
     }
+
+    render() {
+        this.setColumns();
+        const { zoom } = this.props;
+        this.setZoom(zoom);
+
+        var task_sections = [
+            { name: "description", height: 50, map_to: "text", type: "textarea", focus: true },
+            { name: "time", height: 72, type: "time", map_to: "auto" },
+            { name: "holder", height: 50, map_to:"holder", type:"select",options:this.state.playersLabel},
+            { name:"action", height: 50, map_to:"action", type:"select", options:this.state.actionLabel },
+            { name:"priority", height: 50, map_to:"priority", type:"select", options:this.state.priority }
+        ];
+
+        gantt.config.lightbox.sections = task_sections;
+        gantt.locale.labels.section_template = "Details";
+        gantt.attachEvent("onBeforeLightbox", function(id) {
+            var task = gantt.getTask(id);
+            //console.log(task);
+            //task.my_template = "<span id='title1'>Holder: </span>"+ task.holder
+            //+"<span id='title2'>Action: </span>"+ task.action+"<span id='title3'>Priority: </span>"+ task.priority;
+            return true;
+        });
+
+        gantt.refreshData();
+        gantt.render();
+
+        return (
+            <div
+                ref={(input) => { this.ganttContainer = input }}
+                style={{ width: '100%', height: '100%' }}
+            >
+            </div>
+        );
+    }
+
+
 }

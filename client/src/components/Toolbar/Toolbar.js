@@ -21,7 +21,7 @@ export default class Toolbar extends Component {
                 </label>
             );
         });
-
+        console.log("I tried to render toolbar!");
         return (
             <div className="tool-bar">
                 <b>Zooming: </b>

@@ -1,0 +1,150 @@
+{
+	"name": "State level scenario",
+	"type": "scenario",
+	"objects": {
+		"Hospital": {
+			"name": "Hospital",
+			"base": "global",
+			"init_visibility": ["HR-NKT", "Puapa", "Fanua"],
+			"inject_subscribers": ["HR-NKT"]
+		},
+		"H2O-ST": {
+			"name": "H2O-ST",
+			"base": "scenario",
+			"init_visibility": ["HR-NKT", "Puapa", "Fanua"],
+			"inject_subscribers": ["HR-NKT"]
+		},
+		"HEP-ODS": {
+			"name": "HEP-ODS",
+			"base": "scenario",
+			"init_visibility": ["HR-NKT", "Puapa", "Fanua"],
+			"inject_subscribers": ["HR-NKT"]
+		},
+		"Bank": {
+			"name": "Bank",
+			"base": "global",
+			"init_visibility": ["HR-NKT", "Puapa", "Fanua"],
+			"inject_subscribers": ["HR-NKT"]
+		},
+		"Newspaper": {
+			"name": "Newspaper",
+			"base": "global",
+			"init_visibility": ["HR-NKT", "Puapa", "Fanua"],
+			"inject_subscribers": ["HR-NKT"]
+		},
+		"Political party": {
+			"name": "Political party",
+			"base": "global",
+			"init_visibility": ["HR-NKT", "Puapa", "Fanua"],
+			"inject_subscribers": ["HR-NKT"]
+		},
+		"Social network": {
+			"name": "Social network",
+			"base": "global",
+			"init_visibility": ["HR-NKT", "Puapa", "Fanua"],
+			"inject_subscribers": ["HR-NKT"]
+		},
+		"Politician": {
+			"name": "Politician",
+			"base": "global",
+			"init_visibility": ["HR-NKT", "Puapa", "Fanua"],
+			"inject_subscribers": ["HR-NKT"]
+		},
+		"Fanua": {
+			"name": "Fanua infrastructure",
+			"base": "scenario",
+			"init_visibility": ["Fanua"],
+			"inject_subscribers": ["Fanua"]
+		},
+		"Puapa": {
+			"name": "Puapa infrastructure",
+			"base": "scenario",
+			"init_visibility": ["Puapa"],
+			"inject_subscribers": ["Puapa"]
+		}
+		
+	},
+	"players": {
+		"HR-NKT": {
+			"actors": {
+				"NCERT": {
+					"name": "NCERT",
+					"skill": 0.7
+				},
+				"SOA": {
+					"name": "SOA",
+					"skill": 0.8
+				},
+				"VSOA": {
+					"name": "VSOA",
+					"skill": 0.8
+				},
+				"ZSIS": {
+					"name": "ZSIS",
+					"skill": 0.8
+				},
+				"Defence": {
+					"name": "Defence",
+					"skill": 0.8
+				},
+				"Env_Energy": {
+					"name": "Env. and Energy",
+					"skill": 0.3
+				},
+				"Health": {
+					"name": "Health",
+					"skill": 0.3
+				},
+				"Police": {
+					"name": "Police",
+					"skill": 0.7
+				}
+			},
+			"money": 3000
+		},
+		"Puapa": {
+			"actors": {
+				"Media creator":{
+					"name": "Media creator",
+					"skill": 0.8
+				},
+				"Penetester": {
+					"name": "Penetester",
+					"skill": 0.8
+				},
+				"Malware writer":
+				{
+					"name": "Malware writer",
+					"skill": 0.8
+				},
+				"Admin": {
+					"name": "Administrator",
+					"skill": 0.8
+				}
+			},
+			"money": 75000
+		},
+		"Fanua": {
+			"actors": {
+				"Media creator":{
+					"name": "Media creator",
+					"skill": 0.6
+				},
+				"Penetester": {
+					"name": "Penetester",
+					"skill": 0.6
+				},
+				"Malware writer":
+				{
+					"name": "Malware writer",
+					"skill": 0.6
+				},
+				"Admin": {
+					"name": "Administrator",
+					"skill": 0.6
+				}
+			},
+			"money": 5700
+		}
+	}
+}
