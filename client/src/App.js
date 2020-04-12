@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
+import ReactDOM from 'react-dom';
 import Gantt from './components/Gantt';
 import Toolbar from './components/Toolbar';
 import './App.css';
@@ -14,9 +15,18 @@ const data = {
 };
 class App extends Component {
     state = {
-        currentZoom: 'Days'
+        currentZoom: 'Days',
+        currentTime: "0"
     };
 
+    setCurrentTime(){
+        fetch('http://localhost:8080/time').then(res => res.json()).then(data => {
+            this.setState({
+                currentTime: data.time
+            });
+            console.log("data.time: " + data.time);
+        });
+    }
     handleZoomChange = (zoom) => {
         this.setState({
             currentZoom: zoom
@@ -26,14 +36,10 @@ class App extends Component {
     render() {
         const { currentZoom } = this.state;
         console.log(this.state);
+        this.setCurrentTime();
+        console.log(this.state.currentTime);
         return (
             <div>
-                <div className="zoom-bar">
-                    <Toolbar
-                        zoom={currentZoom}
-                        onZoomChange={this.handleZoomChange}
-                    />
-                </div>
                 <div className="gantt-container">
                     <Gantt
                         tasks={data}

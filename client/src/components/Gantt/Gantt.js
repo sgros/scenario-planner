@@ -90,17 +90,6 @@ export default class Gantt extends Component {
         });
         for(let r in priorityList){$('#priority').append($('<option>',{value: r,text: priorityList[r]}))}
 
-//        var prr = "";
-//        for (let pr in priorityList){
-//            if (priorityList.indexOf(pr) !== 0){
-//                prr.append(",");
-//            }
-//            prr.append(pr);
-//        }
-
-
-
-        //var priorities = String.join(",", priorityList);
         var prr = priorities.split(";");
         console.log(prr);
         console.log("before append: " + priorities.split(","));
