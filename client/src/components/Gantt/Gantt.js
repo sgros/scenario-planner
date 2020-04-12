@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { gantt } from 'dhtmlx-gantt';
 import 'dhtmlx-gantt/codebase/dhtmlxgantt.css';
 import $ from "jquery";
-import { jQuery } from 'jquery';
 import jsonTimestamp from '../../static/config.json';
 import jsonAction from '../../static/action.json';
 import jsonStateLevelScenario from '../../static/state_level_scenario.json';
+import GanttTask from '../GanttTask';
 
 export default class Gantt extends Component {
     constructor(props){
@@ -82,17 +82,29 @@ export default class Gantt extends Component {
     }
 
     loadPriorities(){
-        var taskConfigText = null;
-        var jsonConfig = null;
         var priorityList = [];
-
-        jsonConfig = jsonTimestamp;
+        var priorities = "";
         $.each(jsonTimestamp.priority, function(i, val) {
             priorityList.push({"key": i, "label": val})
+            priorities += ";{ key:" + i + ", label:" + val +"}";
         });
-        taskConfigText = jsonTimestamp.task_text;
         for(let r in priorityList){$('#priority').append($('<option>',{value: r,text: priorityList[r]}))}
 
+//        var prr = "";
+//        for (let pr in priorityList){
+//            if (priorityList.indexOf(pr) !== 0){
+//                prr.append(",");
+//            }
+//            prr.append(pr);
+//        }
+
+
+
+        //var priorities = String.join(",", priorityList);
+        var prr = priorities.split(";");
+        console.log(prr);
+        console.log("before append: " + priorities.split(","));
+        gantt.locale.labels["PriorityList"] = priorities;
         return priorityList;
     }
 
@@ -111,11 +123,22 @@ export default class Gantt extends Component {
     }
 
     setColumns(){
+        console.log("gant locale: " + gantt.locale.labels["PriorityList"]);
         gantt.config.columns = [
         {name:"text",       label:"Task name",  tree:true, width: 150 },
         {name:"start_date", label:"Start time", align:"center", resize: true, width: 120 },
         {name:"end_date",   label:"End date",   align:"center", resize: true, width: 120 },
-        {name:"priority",  label:"Priority", height:22, type:"select", map_to:"priority", options:this.state.priorityList, default_value:"Low"},
+        {name:"priority",  label:"Priority", height:22, type:"select", map_to:"priority", template:function(obj){
+            var priorities = gantt.locale.labels["PriorityList"].split(';');
+            var token = "key:" + obj.priority + ",";
+            var correctPriority = priorities.find(element => element.includes(token));
+            var myRegexp = /(?:^|\s)label:(.*?)}(?:\s|$)/g;
+            var match = myRegexp.exec(correctPriority);
+            if (match !== null && match[1] !== null){
+                return match[1];
+            }
+            return "Low";
+        }},
         {name:"add",        label:"",           width:44 }
         ];
     }
@@ -153,6 +176,7 @@ export default class Gantt extends Component {
 
     render() {
         this.setColumns();
+
         const { zoom } = this.props;
         this.setZoom(zoom);
 
@@ -164,18 +188,15 @@ export default class Gantt extends Component {
             { name:"priority", height: 50, map_to:"priority", type:"select", options:this.state.priority }
         ];
 
-        gantt.config.lightbox.sections = task_sections;
-        gantt.locale.labels.section_template = "Details";
-        gantt.attachEvent("onBeforeLightbox", function(id) {
-            var task = gantt.getTask(id);
-            //console.log(task);
-            //task.my_template = "<span id='title1'>Holder: </span>"+ task.holder
-            //+"<span id='title2'>Action: </span>"+ task.action+"<span id='title3'>Priority: </span>"+ task.priority;
-            return true;
-        });
+        gantt.locale.labels["section_holder"] = "Holder";
+        gantt.locale.labels["section_action"] = "Action";
+        gantt.locale.labels["section_priority"] = "Priority";
 
+        gantt.config.lightbox.sections = task_sections;
         gantt.refreshData();
         gantt.render();
+
+        console.log(gantt._lightbox_template);
 
         return (
             <div
@@ -185,6 +206,4 @@ export default class Gantt extends Component {
             </div>
         );
     }
-
-
 }
