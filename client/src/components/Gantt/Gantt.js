@@ -164,6 +164,13 @@ export default class Gantt extends Component {
     }
 
     render() {
+        gantt.load("http://localhost:8080/gantt");
+
+        var dp = gantt.createDataProcessor({
+            url: "http://localhost:8080/gantt",
+            mode:"REST"
+        });
+
         this.setColumns();
 
         const { zoom } = this.props;

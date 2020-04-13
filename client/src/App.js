@@ -36,8 +36,8 @@ class App extends Component {
     render() {
         const { currentZoom } = this.state;
         console.log(this.state);
-        this.setCurrentTime();
-        console.log(this.state.currentTime);
+        //this.setCurrentTime();
+        //console.log(this.state.currentTime);
         return (
             <div>
                 <div className="gantt-container">
