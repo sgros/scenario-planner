@@ -2,7 +2,6 @@ import time
 from flask import Flask, jsonify, request, make_response
 from flask_cors import cross_origin
 from pymongo import MongoClient
-from datetime import datetime
 from bson import json_util
 from flask_cors import CORS
 from datetime import datetime
@@ -48,7 +47,7 @@ def get_current_time():
 @cross_origin()
 def create_task():
     task = {
-        'taskid': get_next_sequence(db.tasks,"taskid"),
+        'taskid': get_next_sequence("taskId"),
         'text': request.form["text"],
         'start_date': request.form["start_date"],
         'end_date': request.form["end_date"],
@@ -62,7 +61,6 @@ def create_task():
         'done': False
     }
 
-    print(task, flush=True)
     db.tasks.insert(task)
     return jsonify({"action":"inserted", "taskid":task['taskid']})
 
@@ -129,12 +127,32 @@ def delete_link(linkId):
     return jsonify({"action": "deleted"})
 
 
-def get_next_sequence(collection, name):
-    sequence = collection.find_and_modify(update={'$inc': {'taskid': 1}}, new=True)
+@app.route('/actions/import', methods=['POST'])
+@cross_origin()
+def import_actions():
+    data = request.get_json()
+    action_data = data['data']
+    loaded_actions = action_data['actions']
+    for (action, properties) in loaded_actions.items():
+        action_data = {
+            "action_id": get_next_sequence("actionId"),
+            "name": action,
+            "preconditions": properties['preconditions'],
+            "posteffect": properties['posteffects'],
+            "time": properties['time'],
+            "price": properties['price']
+        }
+        print(action_data, flush=True)
+        db.actions.insert(action_data)
+    return jsonify({"action": "import"})
+
+
+def get_next_sequence(name):
+    sequence = db.counters.find_and_modify({"_id": name}, {"$inc":{"sequence_value":1}}, new=True)
     print(sequence, flush=True)
     if sequence is None:
-        return 1
-    return sequence.get('taskid')
+        return 0
+    return sequence.get('sequence_value')
 
 
 # def plan_gantt_actions(initialState, goalState):

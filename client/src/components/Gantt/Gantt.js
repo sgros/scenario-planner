@@ -73,11 +73,12 @@ export default class Gantt extends Component {
     }
 
     shouldComponentUpdate(nextProps) {
+        console.log("Should gantt update: ", this.props.zoom !== nextProps.zoom);
         return this.props.zoom !== nextProps.zoom;
     }
 
     componentDidMount() {
-        console.log("Component did in fact mount");
+        console.log("Gantt did mount.");
         this.setColumns();
 
         var task_sections = [
@@ -108,9 +109,9 @@ export default class Gantt extends Component {
         }
     }
 
-//    componentDidUpdate() {
-//        gantt.render();
-//    }
+    componentDidUpdate() {
+        gantt.render();
+    }
 
     loadActions(){
         var actionLabel = [];
@@ -215,7 +216,7 @@ export default class Gantt extends Component {
     render() {
         var zoom = this.props.zoom;
         this.setZoom(zoom);
-
+        console.log("Gantt rendering, zoom set to ", zoom);
         return (
             <div
                 ref={(input) => { this.ganttContainer = input }}
