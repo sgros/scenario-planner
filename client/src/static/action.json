@@ -7,7 +7,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Create ransomware WC2": {
 			"preconditions": "target.name in ['Hospital'] and target.intel_gathered",
@@ -16,7 +17,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Create malware BE4": {
 			"preconditions": "target.name in ['HEP-ODS'] and target.intel_gathered",
@@ -25,7 +27,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Create malware BW": {
 			"preconditions": "target.name in ['H2O-ST'] and target.intel_gathered",
@@ -34,7 +37,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Create backdoor malware": {
 			"preconditions": "target.name in ['Hospital', 'Bank', 'Newspaper', 'Political party', 'Social network', 'Politician'] and target.intel_gathered",
@@ -43,7 +47,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Buy ransomware WC2": {
 			"preconditions": "target.name in ['Hospital'] and target.intel_gathered",
@@ -52,7 +57,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Buy malware BE4": {
 			"preconditions": "target.name in ['HEP-ODS'] and target.intel_gathered",
@@ -61,7 +67,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Buy malware BW": {
 			"preconditions": "target.name in ['H2O-ST'] and target.intel_gathered",
@@ -70,7 +77,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Buy backdoor malware": {
 			"preconditions": "target.name in ['Hospital', 'Bank', 'Newspaper', 'Political party', 'Social network', 'Politician'] and target.intel_gathered",
@@ -79,7 +87,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Maintain ransomware WC2": {
 			"preconditions": "target.name in ['Hospital'] and target.ransomware",
@@ -88,7 +97,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Maintain malware": {
 			"preconditions": "target.name in ['Hospital', 'HEP-ODS', 'H2O-ST', 'Bank', 'Newspaper', 'Political party', 'Social network', 'Politician'] and target.malware",
@@ -97,7 +107,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Create malicious attachments": {
 			"preconditions": "target.name in ['Hospital', 'HEP-ODS', 'H2O-ST', 'Bank', 'Newspaper', 'Political party', 'Social network', 'Politician'] and target.malware",
@@ -106,7 +117,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Malware writer"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Send malicious emails": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Newspaper', 'Political party', 'Social network', 'Politician'] and target.created_attachments",
@@ -115,7 +127,8 @@
 			"object_inject": "inject.log_info = 'Suspicious emails received in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Send targeted malicious emails": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Newspaper', 'Political party', 'Social network', 'Politician'] and target.created_attachments",
@@ -124,7 +137,8 @@
 			"object_inject": "inject.log_info = 'Suspicious emails received in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Spread ransomware WC2 via email": {
 			"preconditions": "target.name in ['Hospital'] and target.ransomware",
@@ -133,7 +147,8 @@
 			"object_inject": "inject.log_info = 'Ransomware appeared in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Establish initial foothold": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Newspaper', 'Political party', 'Social network', 'Politician'] and target.send_malicious",
@@ -142,7 +157,8 @@
 			"object_inject": "inject.log_info = 'Something suspicious is happening in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Exfiltrate data": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Newspaper', 'Political party', 'Social network', 'Politician'] and target.init_foothold",
@@ -151,7 +167,8 @@
 			"object_inject": "inject.log_info = 'Exfiltration has been detected in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Analyze exfiltrated data": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Newspaper', 'Political party', 'Social network', 'Politician'] and target.exfiltrated",
@@ -160,7 +177,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Internal reconnaissance": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Newspaper', 'Political party', 'Social network'] and target.analyze_exfil",
@@ -169,7 +187,8 @@
 			"object_inject": "inject.log_info = 'Suspicious network traffic has been detected in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Lateral movement": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Newspaper', 'Political party', 'Social network'] and target.internal_recon",
@@ -178,7 +197,8 @@
 			"object_inject": "inject.log_info = 'Suspicious network traffic has been detected in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Disable electrical power": {
 			"preconditions": "target.name in ['HEP-ODS'] and target.lateral",
@@ -187,7 +207,8 @@
 			"object_inject": "inject.log_info = 'Electrical power is disabled in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Disable water supply": {
 			"preconditions": "target.name in ['H2O-ST'] and target.lateral",
@@ -196,7 +217,8 @@
 			"object_inject": "inject.log_info = 'Water supply is disabled in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Contaminate water": {
 			"preconditions": "target.name in ['H2O-ST'] and target.lateral",
@@ -205,7 +227,8 @@
 			"object_inject": "inject.log_info = 'Contamination detected in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Destroy SCADA system": {
 			"preconditions": "target.name in ['H2O-ST', 'HEP-ODS'] and target.lateral",
@@ -214,7 +237,8 @@
 			"object_inject": "inject.log_info = 'SCADA system has stopped working in ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Create waterhole website": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Newspaper', 'Political party', 'Social network'] and target.lateral",
@@ -223,7 +247,8 @@
 			"object_inject": "inject.log_info = 'Customers are reporting that website of ' + target.name + ' is declared as malicious.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Publish fake news via media": {
 			"preconditions": "target.name in ['Newspaper'] and target.lateral",
@@ -232,7 +257,8 @@
 			"object_inject": "inject.log_info = 'Dangerous news appeared on ' + target.name + ' portal.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Media creator"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Send fake news to media": {
 			"preconditions": "target.name in ['Newspaper']",
@@ -241,7 +267,8 @@
 			"object_inject": "inject.log_info = 'Dangerous news appeared on ' + target.name + ' portal.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Media creator"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Send compromised information to media": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Political party', 'Social network', 'Politician'] and target.analyze_exfil",
@@ -250,7 +277,8 @@
 			"object_inject": "inject.log_info = 'Compromised data of ' + target.name + ' was published.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Media creator"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Create fake profiles": {
 			"preconditions": "target.name in ['Social network'] and target.intel_gathered",
@@ -259,7 +287,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Media creator"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Maintain fake profiles": {
 			"preconditions": "target.name in ['Social network'] and target.created_profiles",
@@ -268,7 +297,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Media creator"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Post from stolen politician account": {
 			"preconditions": "target.name in ['Politician'] and target.analyze_exfil",
@@ -277,7 +307,8 @@
 			"object_inject": "inject.log_info = 'Politician ' + target.name + ' published incriminating data.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Media creator"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Post from stolen political party portal": {
 			"preconditions": "target.name in ['Political party'] and target.lateral",
@@ -286,7 +317,8 @@
 			"object_inject": "inject.log_info = 'Incriminating data appeared on ' + target.name + ' portal.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Media creator"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Spread fake news via social network": {
 			"preconditions": "target.name in ['Social network'] and target.created_profiles",
@@ -295,7 +327,8 @@
 			"object_inject": "inject.log_info = 'Incriminating data appeared on ' + target.name + '.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Media creator"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"DDoS attack": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS', 'Bank', 'Newspaper', 'Political party', 'Social network'] and target.intel_gathered",
@@ -304,7 +337,8 @@
 			"object_inject": "inject.log_info = 'Services of ' + target.name + ' appears to be unavailable.'; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Penetester"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Maintain infrastructure": {
 			"preconditions": "target.name in ['Fanua', 'Puapa']",
@@ -313,7 +347,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["Administrator"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Search for IOC": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS']",
@@ -322,7 +357,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["NCERT", "SOA", "VSOA", "ZSIS", "Defence", "Env_Energy", "Health", "Police"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Perform forensic": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS'] and target.ioc_search",
@@ -331,7 +367,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["NCERT", "SOA", "VSOA", "ZSIS", "Defence", "Police"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		},
 		"Perform malware analysis": {
 			"preconditions": "target.name in ['Hospital', 'H2O-ST', 'HEP-ODS'] and target.perfomed_forensic",
@@ -340,7 +377,8 @@
 			"object_inject": "inject.log_info = ''; inject.report = ''; inject.delay = randint(20, 40)",
 			"actors": ["NCERT", "ZSIS", "Defence", "Police"],
 			"time": 100,
-			"price": 100
+			"price": 100,
+			"success_rate": 0.5
 		}
 	}
 }

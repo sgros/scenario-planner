@@ -5,17 +5,17 @@ import $ from "jquery";
 import jsonTimestamp from '../../static/config.json';
 import jsonAction from '../../static/action.json';
 import jsonStateLevelScenario from '../../static/state_level_scenario.json';
-import GanttTask from '../GanttTask';
 
 export default class Gantt extends Component {
     constructor(props){
         super(props);
 
         gantt.config.xml_date = "%Y-%m-%d %H:%i";
-        const { tasks } = this.props;
-        gantt.init(this.ganttContainer);
-        gantt.parse(tasks);
+//        const { tasks } = this.props;
         this.configSetup();
+        //gantt.init(this.ganttContainer);
+//        gantt.parse(tasks);
+
 
         var actionLabel = this.loadActions();
         var priorityList = this.loadPriorities();
@@ -26,6 +26,15 @@ export default class Gantt extends Component {
             actionLabel: actionLabel,
             playersLabel: playersLabel
         }
+    }
+
+    dataProcessor = null;
+
+    initGanttDataProcessor(){
+        this.dataProcessor = gantt.createDataProcessor({
+            url: "http://localhost:8080/gantt",
+            mode:"REST"
+        });
     }
 
     setZoom(value) {
@@ -67,9 +76,41 @@ export default class Gantt extends Component {
         return this.props.zoom !== nextProps.zoom;
     }
 
-    componentDidUpdate() {
-        gantt.render();
+    componentDidMount() {
+        console.log("Component did in fact mount");
+        this.setColumns();
+
+        var task_sections = [
+            { name: "description", height: 50, map_to: "text", type: "textarea", focus: true },
+            { name: "time", height: 72, type: "time", map_to: "auto" },
+            { name: "holder", height: 50, map_to:"holder", type:"select",options:this.state.playersLabel},
+            { name:"action", height: 50, map_to:"action", type:"select", options:this.state.actionLabel },
+            { name:"priority", height: 50, map_to:"priority", type:"select", options:this.state.priority },
+            { name: "success_rate", height: 50, map_to:"success_rate", type:"textarea" }
+        ];
+
+        gantt.locale.labels["section_holder"] = "Holder";
+        gantt.locale.labels["section_action"] = "Action";
+        gantt.locale.labels["section_priority"] = "Priority";
+        gantt.locale.labels["section_success_rate"] = "Success rate";
+
+        gantt.config.lightbox.sections = task_sections;
+
+        gantt.init(this.ganttContainer);
+        gantt.load("http://localhost:8080/gantt");
+        this.initGanttDataProcessor();
     }
+
+    componentWillUnmount() {
+        if (this.dataProcessor) {
+            this.dataProcessor.destructor();
+            this.dataProcessor = null;
+        }
+    }
+
+//    componentDidUpdate() {
+//        gantt.render();
+//    }
 
     loadActions(){
         var actionLabel = [];
@@ -90,9 +131,6 @@ export default class Gantt extends Component {
         });
         for(let r in priorityList){$('#priority').append($('<option>',{value: r,text: priorityList[r]}))}
 
-        var prr = priorities.split(";");
-        console.log(prr);
-        console.log("before append: " + priorities.split(","));
         gantt.locale.labels["PriorityList"] = priorities;
         return priorityList;
     }
@@ -111,8 +149,19 @@ export default class Gantt extends Component {
         return playersLabel;
     }
 
+    loadResources(){
+        var resourceLabel = [];
+
+        // add both global resources and task resources
+        var keys = Object.keys(jsonAction.actions);
+        $.each(keys, function(i, val) {
+            resourceLabel.push({"key": i, "label": val})
+        });
+
+        return resourceLabel;
+    }
+
     setColumns(){
-        console.log("gant locale: " + gantt.locale.labels["PriorityList"]);
         gantt.config.columns = [
         {name:"text",       label:"Task name",  tree:true, width: 150 },
         {name:"start_date", label:"Start time", align:"center", resize: true, width: 120 },
@@ -140,13 +189,13 @@ export default class Gantt extends Component {
       gantt.config.auto_scheduling = true;
       gantt.config.autoscroll_speed = 100;
       gantt.config.fit_tasks = true;
-      gantt.config.scale_unit = this.props.zoom.scale_unit;
+      //gantt.config.scale_unit = this.props.zoom.scale_unit;
       gantt.config.duration_unit = "hour";
       gantt.config.scale_height = 50;
-      gantt.config.min_column_width = 1000;
-      gantt.config.date_scale = this.props.zoom.date_scale;
+      gantt.config.min_column_width = 100;
+      //gantt.config.date_scale = this.props.zoom.date_scale;
       gantt.config.open_tree_initially = true;
-      gantt.config.subscales = this.props.zoom.subscales;
+      //gantt.config.subscales = this.props.zoom.subscales;
       gantt.templates.timeline_cell_class = function(task, date){
         if(!gantt.isWorkTime({task:task, date: date}))
           return "week_end";
@@ -164,35 +213,8 @@ export default class Gantt extends Component {
     }
 
     render() {
-        gantt.load("http://localhost:8080/gantt");
-
-        var dp = gantt.createDataProcessor({
-            url: "http://localhost:8080/gantt",
-            mode:"REST"
-        });
-
-        this.setColumns();
-
-        const { zoom } = this.props;
+        var zoom = this.props.zoom;
         this.setZoom(zoom);
-
-        var task_sections = [
-            { name: "description", height: 50, map_to: "text", type: "textarea", focus: true },
-            { name: "time", height: 72, type: "time", map_to: "auto" },
-            { name: "holder", height: 50, map_to:"holder", type:"select",options:this.state.playersLabel},
-            { name:"action", height: 50, map_to:"action", type:"select", options:this.state.actionLabel },
-            { name:"priority", height: 50, map_to:"priority", type:"select", options:this.state.priority }
-        ];
-
-        gantt.locale.labels["section_holder"] = "Holder";
-        gantt.locale.labels["section_action"] = "Action";
-        gantt.locale.labels["section_priority"] = "Priority";
-
-        gantt.config.lightbox.sections = task_sections;
-        gantt.refreshData();
-        gantt.render();
-
-        console.log(gantt._lightbox_template);
 
         return (
             <div

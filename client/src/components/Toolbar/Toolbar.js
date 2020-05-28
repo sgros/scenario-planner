@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 export default class Toolbar extends Component {
     handleZoomChange = (e) => {
         if (this.props.onZoomChange) {
@@ -23,10 +24,9 @@ export default class Toolbar extends Component {
         });
         console.log("I tried to render toolbar!");
         return (
-            <div className="tool-bar">
+            <div>
                 <b>Zooming: </b>
                     { zoomRadios }
-                <button onClick={ this.loadData }>Add data</button>
             </div>
         );
     }
