@@ -133,6 +133,28 @@ def import_actions():
     data = request.get_json()
     action_data = data['data']
     loaded_actions = action_data['actions']
+
+    # if the collection is empty (or does not exist) first insert initial state action and goal state action
+    if "actions" not in db.list_collection_names() or db.actions.count() == 0:
+        initial_state = {
+            "action_id": get_next_sequence("actionId"),
+            "name": "Initial state",
+            "preconditions": "",
+            "posteffect": "",
+            "time": 0,
+            "price": 0
+        }
+        db.actions.insert(initial_state)
+        goal_state = {
+            "action_id": get_next_sequence("actionId"),
+            "name": "Goal state",
+            "preconditions": "",
+            "posteffect": "",
+            "time": 0,
+            "price": 0
+        }
+        db.actions.insert(goal_state)
+
     for (action, properties) in loaded_actions.items():
         action_data = {
             "action_id": get_next_sequence("actionId"),
@@ -142,14 +164,25 @@ def import_actions():
             "time": properties['time'],
             "price": properties['price']
         }
-        print(action_data, flush=True)
         db.actions.insert(action_data)
     return jsonify({"action": "import"})
 
 
+@app.route('/actions', methods=['GET'])
+@cross_origin()
+def get_actions():
+    actions = []
+    actions_data = db.actions.find()
+    for action_data in actions_data:
+        action = {
+            "key": action_data["action_id"],
+            "label": action_data["name"]
+        }
+        actions.append(action)
+    return jsonify({"actions": actions})
+
 def get_next_sequence(name):
     sequence = db.counters.find_and_modify({"_id": name}, {"$inc":{"sequence_value":1}}, new=True)
-    print(sequence, flush=True)
     if sequence is None:
         return 0
     return sequence.get('sequence_value')

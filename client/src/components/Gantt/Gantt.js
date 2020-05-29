@@ -11,11 +11,7 @@ export default class Gantt extends Component {
         super(props);
 
         gantt.config.xml_date = "%Y-%m-%d %H:%i";
-//        const { tasks } = this.props;
         this.configSetup();
-        //gantt.init(this.ganttContainer);
-//        gantt.parse(tasks);
-
 
         var actionLabel = this.loadActions();
         var priorityList = this.loadPriorities();
@@ -73,19 +69,24 @@ export default class Gantt extends Component {
     }
 
     shouldComponentUpdate(nextProps) {
-        console.log("Should gantt update: ", this.props.zoom !== nextProps.zoom);
-        return this.props.zoom !== nextProps.zoom;
+        var actionsUpdated = this.props.actions.length !== nextProps.actions.length;
+        var zoomUpdated = this.props.zoom !== nextProps.zoom;
+
+        return actionsUpdated || zoomUpdated;
     }
 
     componentDidMount() {
-        console.log("Gantt did mount.");
         this.setColumns();
+
+        gantt.serverList("actions", [
+            {key:1, label:"Initial state"}
+        ]);
 
         var task_sections = [
             { name: "description", height: 50, map_to: "text", type: "textarea", focus: true },
-            { name: "time", height: 72, type: "time", map_to: "auto" },
+            { name: "time", height: 72, type: "time", map_to: "auto", time_format:["%d","%m","%Y","%H:%i"] },
             { name: "holder", height: 50, map_to:"holder", type:"select",options:this.state.playersLabel},
-            { name:"action", height: 50, map_to:"action", type:"select", options:this.state.actionLabel },
+            { name:"action", height: 50, map_to:"action", type:"select", options:gantt.serverList("actions") },
             { name:"priority", height: 50, map_to:"priority", type:"select", options:this.state.priority },
             { name: "success_rate", height: 50, map_to:"success_rate", type:"textarea" }
         ];
@@ -150,18 +151,6 @@ export default class Gantt extends Component {
         return playersLabel;
     }
 
-    loadResources(){
-        var resourceLabel = [];
-
-        // add both global resources and task resources
-        var keys = Object.keys(jsonAction.actions);
-        $.each(keys, function(i, val) {
-            resourceLabel.push({"key": i, "label": val})
-        });
-
-        return resourceLabel;
-    }
-
     setColumns(){
         gantt.config.columns = [
         {name:"text",       label:"Task name",  tree:true, width: 150 },
@@ -215,6 +204,8 @@ export default class Gantt extends Component {
 
     render() {
         var zoom = this.props.zoom;
+        var actions = this.props.actions;
+        gantt.updateCollection("actions", actions);
         this.setZoom(zoom);
         console.log("Gantt rendering, zoom set to ", zoom);
         return (

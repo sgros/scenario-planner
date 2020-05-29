@@ -10,21 +10,42 @@ export default class Toolbar extends Component {
         }
     }
 
-    onChangeFile(event) {
-        var file = event.target.files[0];
-        console.log(file);
-        var reader = new FileReader();
-
-        reader.onload = (e) => {
-            var loaded_data = JSON.parse(e.target.result);
-
-            // send loaded data to server to save in database
-            const url = "http://localhost:8080/actions/import";
-            const formData = { data: loaded_data };
-            return post(url, formData)
-                .then(response => console.log(response));
+    importGanttActions(){
+        if (this.props.onActionsUpload) {
+            this.props.onActionsUpload()
         }
-        reader.readAsText(file);
+    }
+
+    handleFileChange = async (e) => {
+        console.log("Handling file change");
+        var fileChanged = await this.onChangeFile(e);
+        console.log("Promise returned: ", fileChanged);
+        if (fileChanged){
+            console.log("File changed!");
+            this.importGanttActions();
+        }
+    }
+
+    async onChangeFile(event) {
+        return new Promise((resolve, reject) => {
+            var file = event.target.files[0];
+            console.log(file);
+            if (file === 'undefined'){
+                resolve(false);
+            }
+            var reader = new FileReader();
+
+            reader.onload = (e) => {
+                var loaded_data = JSON.parse(e.target.result);
+                console.log("Loaded data, should import now.");
+                // send loaded data to server to save in database
+                const url = "http://localhost:8080/actions/import";
+                const formData = { data: loaded_data };
+                var postResult = post(url, formData)
+                    .then(response => resolve(true));
+            }
+            reader.readAsText(file);
+        });
     }
 
     render() {
@@ -51,7 +72,7 @@ export default class Toolbar extends Component {
                         type="file"
                         ref={(ref) => this.upload = ref}
                         style={{display: 'none'}}
-                        onChange={this.onChangeFile.bind(this)}
+                        onChange={this.handleFileChange.bind(this)}
                     />
                     <MuiThemeProvider>
                         <RaisedButton

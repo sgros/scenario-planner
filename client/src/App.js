@@ -8,18 +8,27 @@ class App extends Component {
         super(props);
         this.state = {
             currentZoom: 'Days',
-            currentTime: "0"
+            currentTime: "0",
+            actions: [],
+            isFetchingActions: false
         }
+        this.getGanttActions = this.getGanttActions.bind(this);
     }
 
-    setCurrentTime(){
-        fetch('http://localhost:8080/time').then(res => res.json()).then(data => {
+    async getGanttActions(){
+        console.log("Getting Gantt actions");
+        this.setState({
+            isFetchingActions:true
+        })
+        await fetch('http://localhost:8080/actions').then(res => res.json()).then(data => {
             this.setState({
-                currentTime: data.time
+                actions: data.actions,
+                isFetchingActions:false
             });
-            console.log("data.time: " + data.time);
+            console.log("Loaded actions: ", this.state.actions);
         });
     }
+
     handleZoomChange = (zoom) => {
         console.log("Handling zoom change in app ", zoom);
         this.setState({
@@ -27,20 +36,35 @@ class App extends Component {
         });
     }
 
+    shouldComponentUpdate(nextProps, nextState){
+        if(nextState.isFetchingActions){
+            return false;
+        }
+        return true;
+    }
+
+    componentDidMount() {
+        this.getGanttActions();
+    }
+
     render() {
+        console.log("Rendering app.");
         var currentZoom = this.state.currentZoom;
-        console.log(currentZoom);
+        var ganttActions = this.state.actions;
+        console.log("Gantt actions: ", ganttActions);
         return (
             <div className="app-container">
                 <div className="zoom-bar">
                     <Toolbar
                         zoom={currentZoom}
                         onZoomChange={this.handleZoomChange}
+                        onActionsUpload={this.getGanttActions}
                     />
                 </div>
                 <div className="gantt-container">
                     <Gantt
                         zoom={currentZoom}
+                        actions={ganttActions}
                     />
                 </div>
             </div>
