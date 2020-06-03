@@ -10,7 +10,6 @@ export default class Gantt extends Component {
     constructor(props){
         super(props);
 
-        gantt.config.xml_date = "%Y-%m-%d %H:%i";
         this.configSetup();
 
         var actionLabel = this.loadActions();
@@ -76,6 +75,9 @@ export default class Gantt extends Component {
     }
 
     componentDidMount() {
+        gantt.config.xml_date = "%Y-%m-%d %H:%i";
+        gantt.config.show_links = true;
+
         this.setColumns();
 
         gantt.serverList("actions", [
@@ -88,19 +90,24 @@ export default class Gantt extends Component {
             { name: "holder", height: 50, map_to:"holder", type:"select",options:this.state.playersLabel},
             { name:"action", height: 50, map_to:"action", type:"select", options:gantt.serverList("actions") },
             { name:"priority", height: 50, map_to:"priority", type:"select", options:this.state.priority },
-            { name: "success_rate", height: 50, map_to:"success_rate", type:"textarea" }
+            { name: "success_rate", height: 50, map_to:"success_rate", type:"textarea" },
+            { name: "preconditions", height: 50, map_to:"preconditions", type:"textarea" },
+            { name: "effects", height: 50, map_to:"effects", type:"textarea" }
         ];
 
         gantt.locale.labels["section_holder"] = "Holder";
         gantt.locale.labels["section_action"] = "Action";
         gantt.locale.labels["section_priority"] = "Priority";
         gantt.locale.labels["section_success_rate"] = "Success rate";
+        gantt.locale.labels["section_preconditions"] = "Preconditions";
+        gantt.locale.labels["section_effects"] = "Effects";
 
         gantt.config.lightbox.sections = task_sections;
 
         gantt.init(this.ganttContainer);
         gantt.load("http://localhost:8080/gantt");
         this.initGanttDataProcessor();
+        this.dataProcessor.init(gantt);
     }
 
     componentWillUnmount() {
@@ -199,6 +206,7 @@ export default class Gantt extends Component {
       gantt.locale.labels["milestone"] = "Milestone";
       gantt.config.buttons_left = ["dhx_save_btn", "dhx_cancel_btn", "milestone"];
       gantt.config.buttons_right = ["dhx_delete_btn"];
+
       //addTodayMarker();
     }
 

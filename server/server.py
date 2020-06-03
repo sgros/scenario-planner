@@ -58,11 +58,13 @@ def create_task():
         'parent': request.form["parent"],
         'duration': int(request.form["duration"]),
         'success_rate': request.form["success_rate"],
+        'preconditions': request.form["preconditions"],
+        'effects': request.form["effects"],
         'done': False
     }
 
     db.tasks.insert(task)
-    return jsonify({"action":"inserted", "taskid":task['taskid']})
+    return jsonify({"action": "inserted", "tid": "taskId"})
 
 
 @app.route('/gantt', methods=['GET'])
@@ -73,57 +75,104 @@ def get_tasks():
 
     for mongo_task in mongo_tasks:
         task = {
-            'id': str(mongo_task['taskid']),
+            'id': int(mongo_task['taskid']),
             'text': mongo_task['text'],
             'start_date':mongo_task['start_date'],
             'end_date':mongo_task['end_date'],
             'holder': mongo_task['holder'],
             'action': mongo_task['action'],
             'priority': mongo_task['priority'],
-            #'progress': float(mongo_task['progress']),
-            #'duration':int(mongo_task['duration']),
-            #'parent': mongo_task['parent'],
-            #'success_rate': mongo_task['success_rate'],
-            #'done': mongo_task['done']
+            'progress': mongo_task['progress'],
+            'duration': mongo_task['duration'],
+            'parent': mongo_task['parent'],
+            'success_rate': mongo_task['success_rate'],
+            'preconditions': mongo_task['preconditions'],
+            'effects': mongo_task['effects'],
+            'done': mongo_task['done']
         }
-        print(task, flush=True)
         tasks.append(task)
 
+    mongo_links = [link for link in db.links.find({})]
+    links = []
 
-    lnks = [
-        {"id":"1", "source":"2", "target":"3", "type":"0"}
-    ]
+    for mongo_link in mongo_links:
+        link = {
+            'id': int(mongo_link['link_id']),
+            'source': mongo_link['source'],
+            'target': mongo_link['target'],
+            'type': str(mongo_link['type'])
+        }
+        links.append(link)
 
-    return json_util.dumps({'data': tasks, 'links':lnks})
+    print(links, flush=True)
+    #print(json_util.dumps({'data': tasks, 'links': links}),flush=True)
+    return json_util.dumps({'data': tasks, 'links': links})
 
 
 @app.route('/gantt/task/<taskId>', methods=['PUT'])
 @cross_origin()
 def update_task(taskId):
-    return jsonify({"action":"updated"})
+    query = {"taskid": int(float(taskId))}
+    values = {"$set": {
+        'text': request.form["text"],
+        'start_date': request.form["start_date"],
+        'end_date': request.form["end_date"],
+        'holder': request.form["holder"],
+        'action': request.form["action"],
+        'priority': request.form["priority"],
+        'progress': float(request.form["progress"]),
+        'parent': request.form["parent"],
+        'duration': int(request.form["duration"]),
+        'success_rate': request.form["success_rate"],
+        'preconditions': request.form["preconditions"],
+        'effects': request.form["effects"],
+    }}
+
+    print(query, flush=True)
+    print(values, flush=True)
+    db.tasks.find_one_and_update(query, values)
+    return jsonify({"action": "updated"})
 
 
 @app.route('/gantt/task/<taskId>', methods=['DELETE'])
 @cross_origin()
 def delete_task(taskId):
-    return jsonify({"action":"deleted"})
+    query = {"taskid": int(float(taskId))}
+    db.tasks.delete_one(query)
+    return jsonify({"action": "deleted"})
 
 
 @app.route('/gantt/link', methods=['POST'])
 @cross_origin()
 def add_link():
+    link = {
+        "link_id": get_next_sequence("linkId"),
+        "source": int(float(request.form['source'])),
+        "target": int(float(request.form['target'])),
+        "type": str(int(request.form['type']))
+    }
+    db.links.insert(link)
     return jsonify({"action": "inserted", "tid": "linkId"})
 
 
 @app.route('/gantt/link/<linkId>', methods=['PUT'])
 @cross_origin()
 def update_link(linkId):
+    query = {"link_id": int(linkId)}
+    values = {"$set": {
+        "source": int(float(request.form['source'])),
+        "target": int(float(request.form['target'])),
+        "type": str(int(request.form['type']))
+    }}
+    db.links.find_one_and_update(query, values)
     return jsonify({"action": "updated"})
 
 
 @app.route('/gantt/link/<linkId>', methods=['DELETE'])
 @cross_origin()
 def delete_link(linkId):
+    query = {"link_id":int(linkId)}
+    db.links.remove(query)
     return jsonify({"action": "deleted"})
 
 
