@@ -5,6 +5,7 @@ from pymongo import MongoClient
 from bson import json_util
 from flask_cors import CORS
 from datetime import datetime
+import random
 
 app = Flask(__name__)
 client = MongoClient('mongo', 27017)
@@ -26,11 +27,6 @@ def root():
 @cross_origin()
 def get_current_time():
     return jsonify({ 'time': time.time() })
-
-
-# @app.route('/actions', methods=['POST'])
-# @cross_origin()
-# def import_actions():
 
 
 # @app.route('/gantt/plan', methods=['GET'])
@@ -237,10 +233,177 @@ def get_next_sequence(name):
     return sequence.get('sequence_value')
 
 
-# def plan_gantt_actions(initialState, goalState):
-# implement planning algorithm
-# construct gantt diagram (in mongo)
-# return success or failure
+def parse_conditions(conditions):
+    condition_objects = conditions.split(", ")
+    conditions = []
+    for condition_object in condition_objects:
+        condition_value = condition_object.split(" = ")
+        condition = {
+            'name': condition_value[0],
+            'value': condition_value[1].lower() == 'true'
+        }
+        conditions.append(condition)
+    return conditions
+
+
+def plan_gantt_actions():
+    causal_links = []
+    ordering_constraints = []
+    steps = []
+    goals = []
+    actions = []
+    db_actions = db.actions.find()
+    for db_action in db_actions:
+        action = {
+            'action_id': db_action['action_id'],
+            'name': db_action['name'],
+            'preconditions': parse_conditions(db_action['preconditions']),
+            'posteffects': parse_conditions(db_action['posteffects']),
+            'time': int(db_action['time'])
+        }
+        actions.append(action)
+
+    db_initial_state = db.tasks.find({'action': 0})
+    initial_step = {
+        'step_id': int(db_initial_state['action']),  # initial state action id = 1
+        'preconditions': [],
+        'posteffects': parse_conditions(db_initial_state['posteffects'])
+    }
+    steps.append(initial_step)
+
+    db_goal_state = db.tasks.find({'action': 1})
+    goal_conditions = parse_conditions(db_goal_state['preconditions'])
+    goal_step = {
+        'step_id': int(db_goal_state['action']),  # goal state action id = 2
+        'preconditions': goal_conditions,
+        'posteffects': []
+    }
+    steps.append(goal_step)
+
+    for goal_condition in goal_conditions:
+        goal_state = {
+            'c': goal_condition,
+            'S': goal_step
+        }
+        goals.append(goal_state)
+
+    plan_problem = {
+        'steps': steps,
+        'ordering_constraints': ordering_constraints,
+        'causal_links': causal_links,
+        'successful': False
+    }
+
+    plan = partial_order_planner(plan_problem, goals, actions)
+    if plan['successful']:
+        return construct_gantt_total_order_plan(plan)
+    return False
+
+
+def partial_order_planner(plan_problem, goals, actions):
+    # 1. if G is empty terminate and return plan
+    if goals.count() == 0:
+        return plan_problem
+
+    # 2. select {c,S} e G
+    current_goal = random.choice(goals)
+    current_goal_precondition = current_goal['c']
+
+    # 2.a if there's a link "S[i] -(e, not c)-> S" in causal links L fail -> IMPOSSIBLE PLAN
+    causal_links = plan_problem['causal_links']
+    contains_contradiction = False
+    for link in causal_links:
+        if link['target']['step_id'] == current_goal['S']['step_id'] \
+                and link['c']['name'] == current_goal_precondition['name'] \
+                and link['c']['value'] != current_goal_precondition['value']:
+            contains_contradiction = True
+
+    if contains_contradiction:
+        plan_problem['successful'] = False
+        return plan_problem
+
+    # 3. nondeterministically select step S or action with effect e
+    #   if there is no such action fail -> IMPOSSIBLE PLAN
+    #   otherwise update planning problem
+    valid_actions = where_contains_effect(actions, current_goal_precondition['name'], current_goal_precondition['value'])
+    selected_action = random.choice(valid_actions)
+
+    if selected_action is None:
+        plan_problem['successful'] = False
+        return plan_problem
+
+    selected_step = next((x for x in plan_problem['steps'] if x['step_id'] == selected_action['action_id']), None)
+    if selected_step is None:
+        selected_step = {
+            'step_id': selected_action['action_id'],
+            'preconditions': selected_action['preconditions'],
+            'posteffects': selected_action['posteffects']
+        }
+
+    # Update G
+    goals.remove(current_goal)
+    for precondition in selected_step['preconditions']:
+        new_goal = {
+            'c': precondition,
+            'S': selected_step
+        }
+        goals.append(new_goal)
+
+    # Update O
+    new_order = {
+        'predecessor': selected_step,
+        'successor': current_goal['S']
+    }
+    plan_problem['ordering_constraints'].append(new_order)
+
+    # Update L
+    new_causal_link = {
+        'source': selected_step,
+        'c': current_goal_precondition,
+        'target': current_goal['S']
+    }
+    plan_problem['causal_links'].append(new_causal_link)
+
+    # 4. causal link protection (demotion)
+    selected_step_posteffects = selected_step['posteffects']
+    for causal_link in causal_links:
+        condition = causal_link['c']
+        is_threat = check_if_threat(condition, selected_step_posteffects)
+        if is_threat:
+            protection_order = {
+                'predecessor': selected_step,
+                'successor': causal_link['source']
+            }
+            plan_problem['ordering_constraints'].append(protection_order)
+
+    # 5. recursively call PoP
+    return partial_order_planner(plan_problem, goals, actions)
+
+
+def construct_gantt_total_order_plan(partial_plan):
+    for step in partial_plan['steps']:
+        print(step, flush=True)
+    return False
+
+
+def check_if_threat(condition, posteffects):
+    is_threat = False
+    for posteffect in posteffects:
+        if posteffect['name'] == condition['name'] and posteffect['value'] != condition['value']:
+            is_threat = True
+            break
+    return is_threat
+
+
+def where_contains_effect(actions, condition_name, condition_value):
+    valid_actions = []
+    for action in actions:
+        effects = action['posteffects']
+        for effect in effects:
+            if effect['name'] == condition_name and effect['value'] == condition_value:
+                valid_actions.append(action)
+                break
+    return valid_actions
 
 
 if __name__ == '__main__':
