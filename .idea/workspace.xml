@@ -33,11 +33,21 @@
       <file leaf-file-name="server.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2247">
-              <caret line="380" lean-forward="true" selection-start-line="380" selection-end-line="380" />
+            <state relative-caret-position="290">
+              <caret line="345" column="34" lean-forward="true" selection-start-line="345" selection-start-column="34" selection-end-line="345" selection-end-column="34" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#449#618#0" />
+                <element signature="e#685#724#0" />
+                <element signature="e#1156#1834#0" />
+                <element signature="e#1945#3250#0" />
+                <element signature="e#3039#3821#0" />
+                <element signature="e#3925#3961#0" />
+                <element signature="e#4334#4618#0" />
+                <element signature="e#4498#4535#0" />
+                <element signature="e#4837#4874#0" />
                 <element signature="e#3524#4751#0" />
+                <element signature="e#4891#5144#0" />
               </folding>
             </state>
           </provider>
@@ -81,8 +91,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>onBeforeGanttRender</find>
-      <find>gantt =</find>
       <find>DHXGantt</find>
       <find>createTaskRenderer</find>
       <find>gantt.config.</find>
@@ -111,6 +119,8 @@
       <find>gantt.pa</find>
       <find>usesta</find>
       <find>ganttContainer</find>
+      <find>return plan_pro</find>
+      <find>print</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -269,7 +279,7 @@
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.32969698" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.32969698" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="8" visible="true" weight="0.40242425" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -556,6 +566,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-201">
+          <caret line="44" column="53" selection-start-line="44" selection-start-column="53" selection-end-line="44" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-515">
@@ -571,20 +588,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-201">
-          <caret line="44" column="53" selection-start-line="44" selection-start-column="53" selection-end-line="44" selection-end-column="53" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2247">
-          <caret line="380" lean-forward="true" selection-start-line="380" selection-end-line="380" />
+        <state relative-caret-position="290">
+          <caret line="345" column="34" lean-forward="true" selection-start-line="345" selection-start-column="34" selection-end-line="345" selection-end-column="34" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#449#618#0" />
+            <element signature="e#685#724#0" />
+            <element signature="e#1156#1834#0" />
+            <element signature="e#1945#3250#0" />
+            <element signature="e#3039#3821#0" />
+            <element signature="e#3925#3961#0" />
+            <element signature="e#4334#4618#0" />
+            <element signature="e#4498#4535#0" />
+            <element signature="e#4837#4874#0" />
             <element signature="e#3524#4751#0" />
+            <element signature="e#4891#5144#0" />
           </folding>
         </state>
       </provider>

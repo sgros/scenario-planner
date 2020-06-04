@@ -15,6 +15,9 @@ CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 
+#region API
+
+
 @app.route('/', methods=['GET'])
 @cross_origin()
 def root():
@@ -29,14 +32,11 @@ def get_current_time():
     return jsonify({ 'time': time.time() })
 
 
-# @app.route('/gantt/plan', methods=['GET'])
-# @cross_origin()
-# def get_plan():
-# tbd:
-#     - get initial state and goal
-#     - call planning algorithm
-#         - constructs gantt diagram with correct actions and links
-#     - return success or failure
+@app.route('/gantt/plan', methods=['GET'])
+@cross_origin()
+def get_plan():
+    result = plan_gantt_actions()
+    return jsonify({'success': result})
 
 
 @app.route('/gantt/task', methods=['POST'])
@@ -100,8 +100,6 @@ def get_tasks():
         }
         links.append(link)
 
-    print(links, flush=True)
-    #print(json_util.dumps({'data': tasks, 'links': links}),flush=True)
     return json_util.dumps({'data': tasks, 'links': links})
 
 
@@ -225,6 +223,10 @@ def get_actions():
         }
         actions.append(action)
     return jsonify({"actions": actions})
+#endregion
+
+
+#region utils
 
 def get_next_sequence(name):
     sequence = db.counters.find_and_modify({"_id": name}, {"$inc":{"sequence_value":1}}, new=True)
@@ -234,16 +236,44 @@ def get_next_sequence(name):
 
 
 def parse_conditions(conditions):
-    condition_objects = conditions.split(", ")
+    condition_objects = conditions.split("; ")
     conditions = []
     for condition_object in condition_objects:
+        if condition_object == '':
+            continue
         condition_value = condition_object.split(" = ")
+        if len(condition_value) == 0:
+            continue
         condition = {
-            'name': condition_value[0],
+            'name': condition_value[0].strip(),
             'value': condition_value[1].lower() == 'true'
         }
         conditions.append(condition)
     return conditions
+
+def check_if_threat(condition, posteffects):
+    is_threat = False
+    for posteffect in posteffects:
+        if posteffect['name'] == condition['name'] and posteffect['value'] != condition['value']:
+            is_threat = True
+            break
+    return is_threat
+
+
+def where_contains_effect(actions, condition_name, condition_value):
+    valid_actions = []
+    for action in actions:
+        effects = action['posteffects']
+        for effect in effects:
+            if effect['name'] == condition_name and effect['value'] == condition_value:
+                valid_actions.append(action)
+                break
+    return valid_actions
+
+#endregion
+
+
+#region PoP
 
 
 def plan_gantt_actions():
@@ -258,20 +288,20 @@ def plan_gantt_actions():
             'action_id': db_action['action_id'],
             'name': db_action['name'],
             'preconditions': parse_conditions(db_action['preconditions']),
-            'posteffects': parse_conditions(db_action['posteffects']),
+            'posteffects': parse_conditions(db_action['posteffect']),
             'time': int(db_action['time'])
         }
         actions.append(action)
 
-    db_initial_state = db.tasks.find({'action': 0})
+    db_initial_state = db.tasks.find_one({'action': "1"})
     initial_step = {
         'step_id': int(db_initial_state['action']),  # initial state action id = 1
         'preconditions': [],
-        'posteffects': parse_conditions(db_initial_state['posteffects'])
+        'posteffects': parse_conditions(db_initial_state['effects'])
     }
     steps.append(initial_step)
 
-    db_goal_state = db.tasks.find({'action': 1})
+    db_goal_state = db.tasks.find_one({'action': "2"})
     goal_conditions = parse_conditions(db_goal_state['preconditions'])
     goal_step = {
         'step_id': int(db_goal_state['action']),  # goal state action id = 2
@@ -295,6 +325,7 @@ def plan_gantt_actions():
     }
 
     plan = partial_order_planner(plan_problem, goals, actions)
+    db.partial_plans.insert(plan)
     if plan['successful']:
         return construct_gantt_total_order_plan(plan)
     return False
@@ -302,7 +333,8 @@ def plan_gantt_actions():
 
 def partial_order_planner(plan_problem, goals, actions):
     # 1. if G is empty terminate and return plan
-    if goals.count() == 0:
+    if len(goals) == 0:
+        plan_problem['successful'] = True
         return plan_problem
 
     # 2. select {c,S} e G
@@ -326,6 +358,10 @@ def partial_order_planner(plan_problem, goals, actions):
     #   if there is no such action fail -> IMPOSSIBLE PLAN
     #   otherwise update planning problem
     valid_actions = where_contains_effect(actions, current_goal_precondition['name'], current_goal_precondition['value'])
+    if len(valid_actions) == 0:
+        plan_problem['successful'] = False
+        return plan_problem
+
     selected_action = random.choice(valid_actions)
 
     if selected_action is None:
@@ -340,6 +376,7 @@ def partial_order_planner(plan_problem, goals, actions):
             'posteffects': selected_action['posteffects']
         }
 
+    plan_problem['steps'].append(selected_step)
     # Update G
     goals.remove(current_goal)
     for precondition in selected_step['preconditions']:
@@ -379,31 +416,16 @@ def partial_order_planner(plan_problem, goals, actions):
     # 5. recursively call PoP
     return partial_order_planner(plan_problem, goals, actions)
 
+#endregion
+
+
+#region Gantt Plan
 
 def construct_gantt_total_order_plan(partial_plan):
-    for step in partial_plan['steps']:
-        print(step, flush=True)
     return False
 
 
-def check_if_threat(condition, posteffects):
-    is_threat = False
-    for posteffect in posteffects:
-        if posteffect['name'] == condition['name'] and posteffect['value'] != condition['value']:
-            is_threat = True
-            break
-    return is_threat
-
-
-def where_contains_effect(actions, condition_name, condition_value):
-    valid_actions = []
-    for action in actions:
-        effects = action['posteffects']
-        for effect in effects:
-            if effect['name'] == condition_name and effect['value'] == condition_value:
-                valid_actions.append(action)
-                break
-    return valid_actions
+#endregion
 
 
 if __name__ == '__main__':
