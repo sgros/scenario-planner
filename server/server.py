@@ -270,6 +270,26 @@ def where_contains_effect(actions, condition_name, condition_value):
                 break
     return valid_actions
 
+
+def update_action_links(has_link, source, target):
+    updated_links = []
+    for link in has_link:
+        if link['action_id'] == source:
+            link['linked_to'] = target
+        if link['action_id'] == target:
+            link['linked_from'] = source
+        updated_links.append(link)
+    return updated_links
+
+
+def conditions_intersection(first, second):
+    intersection = []
+    for first_cond in first:
+        for second_cond in second:
+            if first_cond['name'] == second_cond['name'] \
+                    and first_cond['value'] == second_cond['value']:
+                intersection.append(first_cond)
+    return intersection
 #endregion
 
 
@@ -375,8 +395,8 @@ def partial_order_planner(plan_problem, goals, actions):
             'preconditions': selected_action['preconditions'],
             'posteffects': selected_action['posteffects']
         }
+        plan_problem['steps'].append(selected_step)
 
-    plan_problem['steps'].append(selected_step)
     # Update G
     goals.remove(current_goal)
     for precondition in selected_step['preconditions']:
@@ -401,17 +421,52 @@ def partial_order_planner(plan_problem, goals, actions):
     }
     plan_problem['causal_links'].append(new_causal_link)
 
-    # 4. causal link protection (demotion)
+    # 4. causal link protection
     selected_step_posteffects = selected_step['posteffects']
     for causal_link in causal_links:
         condition = causal_link['c']
+        source = causal_link['source']
+        target = causal_link['target']
         is_threat = check_if_threat(condition, selected_step_posteffects)
         if is_threat:
-            protection_order = {
-                'predecessor': selected_step,
-                'successor': causal_link['source']
+            # case 1: DEMOTION -> is threat, but does not depend on source
+            dependencies = conditions_intersection(source['posteffects'], selected_step['preconditions'])
+            if len(dependencies) == 0:
+                protection_order = {
+                    'predecessor': selected_step,
+                    'successor': causal_link['target']
+                }
+                plan_problem['ordering_constraints'].append(protection_order)
+                continue
+
+            # case 2: PROMOTION -> is threat, depends on source, target does not threaten it
+            causal_link_target = causal_link['target']
+
+            constraint_threat = {
+                'name': condition['name'],
+                'value': not condition['value']
             }
-            plan_problem['ordering_constraints'].append(protection_order)
+
+            target_threats_step = any(effect['name'] == constraint_threat['name']
+                                      and effect['value'] == constraint_threat['value'] for effect in
+                                      causal_link_target['posteffects'])
+
+            if not target_threats_step:
+                protection_order = {
+                    'predecessor': causal_link['target'],
+                    'successor': selected_step
+                }
+                plan_problem['ordering_constraints'].append(protection_order)
+                # temp_constraints = [c for c in plan_problem['ordering_constraints']
+                #                     if c['predecessor']['step_id'] != causal_link['source']['step_id']
+                #                     and c['successor']['step_id'] != selected_step['step_id']]
+                #
+                # plan_problem['ordering_constraints'] = temp_constraints
+                continue
+
+            # case 3: IMPOSSIBLE PLAN
+            plan_problem['successful'] = False
+            return plan_problem
 
     # 5. recursively call PoP
     return partial_order_planner(plan_problem, goals, actions)
@@ -421,7 +476,139 @@ def partial_order_planner(plan_problem, goals, actions):
 
 #region Gantt Plan
 
+
+def get_recursive_predecessors(order_constraints, step_id):
+    recursive_predecessors = []
+    direct_predecessors = [c['predecessor']['step_id'] for c in order_constraints
+                           if c['successor']['step_id'] == step_id]
+    recursive_predecessors.extend(direct_predecessors)
+    for pred in direct_predecessors:
+        preds = get_recursive_predecessors(order_constraints, pred)
+        recursive_predecessors.extend(preds)
+
+    return set(recursive_predecessors)
+
+
+def get_recursive_successors(order_constraints, step_id):
+    recursive_successors = []
+    direct_predecessors = [c['successor']['step_id'] for c in order_constraints
+                           if c['predecessor']['step_id'] == step_id]
+    recursive_successors.extend(direct_predecessors)
+    for pred in direct_predecessors:
+        preds = get_recursive_successors(order_constraints, pred)
+        recursive_successors.extend(preds)
+    return set(recursive_successors)
+
+
+def max_predecessor(total_order, predecessors):
+    max_pred = 0
+    for i in range(len(total_order)):
+        if total_order[i] in predecessors:
+            max_pred = i
+    return max_pred
+
+
+def min_successor(total_order, successors):
+    min_suc = len(total_order)-1
+    for i in reversed(range(len(total_order))):
+        if total_order[i] in successors:
+            min_suc = i
+    return min_suc
+
+
+def construct_total_order(partial_order):
+    total_order = []
+    i = 0
+    for step in partial_order['steps']:
+        if len(total_order) < 2:
+            total_order.append(step['step_id'])
+            continue
+        predecessors = get_recursive_predecessors(partial_order['ordering_constraints'], step['step_id'])
+        successors = get_recursive_successors(partial_order['ordering_constraints'], step['step_id'])
+        min_i = max_predecessor(total_order, predecessors)
+        max_i = min_successor(total_order, successors)
+        if min_i > max_i:
+            print("There has been an error!", flush=True)
+            print(step['step_id'], flush=True)
+            print(total_order, flush=True)
+            print(predecessors, flush=True)
+            print(successors, flush=True)
+        index = 0
+        if min_i == max_i or min_i+1==max_i:
+            index = max_i
+        else:
+            index = random.randint(min_i + 1, max_i)
+        total_order.insert(index, step['step_id'])
+
+    return total_order
+
+
+def construct_final_order(total_order):
+    final_order = []
+    order_max_i = len(total_order)
+    for i in range(len(total_order)):
+        if i + 1 < order_max_i:
+            order = {
+                'predecessor': total_order[i],
+                'successor': total_order[i+1]
+            }
+            final_order.append(order)
+    return final_order
+
+
 def construct_gantt_total_order_plan(partial_plan):
+    initial_task = db.tasks.find_one({'action': "1"})
+    goal_task = db.tasks.find_one({'action': "2"})
+    for step in partial_plan['steps']:
+        if step['step_id'] == 1 or step['step_id'] == 2:
+            continue
+        step_action = db.actions.find_one({'action_id': step['step_id']})
+        task = {
+            'taskid': get_next_sequence("taskId"),
+            'text': step_action['name'],
+            'start_date': initial_task['start_date'],
+            'end_date': initial_task['end_date'],
+            'holder': "1",
+            'action': str(step_action['action_id']),
+            'priority': initial_task['priority'],
+            'progress': 0.0,
+            'parent': initial_task["parent"],
+            'duration': initial_task["duration"],
+            'success_rate': initial_task["success_rate"],
+            'preconditions': step_action["preconditions"],
+            'effects': step_action["posteffect"],
+            'done': False
+        }
+        db.tasks.insert(task)
+
+    has_link = []
+    all_tasks = db.tasks.find()
+    for task in all_tasks:
+        task_has_link = {
+            'task_id': task['taskid'],
+            'action_id': int(float(task['action'])),
+            'linked_to': 0,
+            'linked_from': 0
+        }
+        has_link.append(task_has_link)
+
+    total_order = construct_total_order(partial_plan)
+    final_order = construct_final_order(total_order)
+    for order in final_order:
+        action_from = order['predecessor']
+        action_to = order['successor']
+        task_from = db.tasks.find_one({'action': str(action_from)})
+        task_to = db.tasks.find_one({'action': str(action_to)})
+        link = {
+            'link_id': get_next_sequence('linkId'),
+            'source': int(task_from['taskid']),
+            'target': int(task_to['taskid']),
+            'type': "0"
+        }
+        db.links.insert(link)
+        has_link = update_action_links(has_link, action_to, action_from)
+
+    print(has_link, flush=True)
     return False
 
 
