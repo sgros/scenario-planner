@@ -16,6 +16,13 @@ export default class Toolbar extends Component {
         }
     }
 
+    calculatePlan(){
+        console.log("Will trigger props method for plan calculation.");
+        if (this.props.onCalculatePlan){
+            this.props.onCalculatePlan()
+        }
+    }
+
     handleFileChange = async (e) => {
         console.log("Handling file change");
         var fileChanged = await this.onChangeFile(e);
@@ -68,13 +75,16 @@ export default class Toolbar extends Component {
                         { zoomRadios }
                 </div>
                 <div>
+                    <button className="button-left" onClick={() => this.calculatePlan()}>
+                        Calculate plan
+                    </button>
                     <input id="myInput"
                         type="file"
                         ref={(ref) => this.upload = ref}
                         style={{display: 'none'}}
                         onChange={this.handleFileChange.bind(this)}
                     />
-                    <MuiThemeProvider>
+                    <MuiThemeProvider className="button-right">
                         <RaisedButton
                             label="Import actions"
                             primary={false}

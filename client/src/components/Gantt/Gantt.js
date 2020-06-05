@@ -70,8 +70,9 @@ export default class Gantt extends Component {
     shouldComponentUpdate(nextProps) {
         var actionsUpdated = this.props.actions.length !== nextProps.actions.length;
         var zoomUpdated = this.props.zoom !== nextProps.zoom;
+        var planUpdated = nextProps.planUpdated;
 
-        return actionsUpdated || zoomUpdated;
+        return actionsUpdated || zoomUpdated || planUpdated;
     }
 
     componentDidMount() {
@@ -118,6 +119,14 @@ export default class Gantt extends Component {
     }
 
     componentDidUpdate() {
+        console.log("Component did update -> gantt.render");
+        if (this.props.planUpdated){
+            console.log("It also loaded tasks.");
+            gantt.init(this.ganttContainer);
+            gantt.load("http://localhost:8080/gantt");
+            this.initGanttDataProcessor();
+            this.dataProcessor.init(gantt);
+        }
         gantt.render();
     }
 
@@ -160,21 +169,9 @@ export default class Gantt extends Component {
 
     setColumns(){
         gantt.config.columns = [
-        {name:"text",       label:"Task name",  tree:true, width: 150 },
-        {name:"start_date", label:"Start time", align:"center", resize: true, width: 120 },
-        {name:"end_date",   label:"End date",   align:"center", resize: true, width: 120 },
-        {name:"priority",  label:"Priority", height:22, type:"select", map_to:"priority", template:function(obj){
-            var priorities = gantt.locale.labels["PriorityList"].split(';');
-            var token = "key:" + obj.priority + ",";
-            var correctPriority = priorities.find(element => element.includes(token));
-            var myRegexp = /(?:^|\s)label:(.*?)}(?:\s|$)/g;
-            var match = myRegexp.exec(correctPriority);
-            if (match !== null && match[1] !== null){
-                return match[1];
-            }
-            return "Low";
-        }},
-        {name:"add",        label:"",           width:44 }
+            {name:"text",       label:"Task name",  tree:true, width: 250 },
+            {name:"start_date", label:"Start time", align:"center", resize: true, width: 100 },
+            {name:"add",        label:"",           width:44 }
         ];
     }
 
@@ -186,24 +183,11 @@ export default class Gantt extends Component {
       gantt.config.auto_scheduling = true;
       gantt.config.autoscroll_speed = 100;
       gantt.config.fit_tasks = true;
-      //gantt.config.scale_unit = this.props.zoom.scale_unit;
       gantt.config.duration_unit = "hour";
       gantt.config.scale_height = 50;
       gantt.config.min_column_width = 100;
-      //gantt.config.date_scale = this.props.zoom.date_scale;
       gantt.config.open_tree_initially = true;
-      //gantt.config.subscales = this.props.zoom.subscales;
-      gantt.templates.timeline_cell_class = function(task, date){
-        if(!gantt.isWorkTime({task:task, date: date}))
-          return "week_end";
-        return "";
-      };
-      gantt.setWorkTime({
-        hours: [9,17]
-      })
-      gantt.setWorkTime({ day:6, hours:false });
-      gantt.setWorkTime({ day:7, hours:false });
-      gantt.locale.labels["milestone"] = "Milestone";
+      gantt.config.duration_unit = "minute";
       gantt.config.buttons_left = ["dhx_save_btn", "dhx_cancel_btn", "milestone"];
       gantt.config.buttons_right = ["dhx_delete_btn"];
 

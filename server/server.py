@@ -4,7 +4,7 @@ from flask_cors import cross_origin
 from pymongo import MongoClient
 from bson import json_util
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 
 app = Flask(__name__)
@@ -35,6 +35,7 @@ def get_current_time():
 @app.route('/gantt/plan', methods=['GET'])
 @cross_origin()
 def get_plan():
+    clean_previous_plan_if_exists()
     result = plan_gantt_actions()
     return jsonify({'success': result})
 
@@ -235,6 +236,15 @@ def get_next_sequence(name):
     return sequence.get('sequence_value')
 
 
+def clean_previous_plan_if_exists():
+    db.links.remove({})
+    db.counters.find_and_modify({"_id": 'linkId'}, {"$set": {"sequence_value": 0}})
+    db.counters.find_and_modify({"_id": 'taskId'}, {"$set": {"sequence_value": 2}})
+    query = {"taskid": {"$gt": 2}}
+    db.tasks.remove(query)
+    db.partial_plans.remove({})
+
+
 def parse_conditions(conditions):
     condition_objects = conditions.split("; ")
     conditions = []
@@ -290,6 +300,14 @@ def conditions_intersection(first, second):
                     and first_cond['value'] == second_cond['value']:
                 intersection.append(first_cond)
     return intersection
+
+
+def get_step(action_id, steps):
+    for step in steps:
+        if step['step_id'] == action_id:
+            return step
+
+
 #endregion
 
 
@@ -317,7 +335,8 @@ def plan_gantt_actions():
     initial_step = {
         'step_id': int(db_initial_state['action']),  # initial state action id = 1
         'preconditions': [],
-        'posteffects': parse_conditions(db_initial_state['effects'])
+        'posteffects': parse_conditions(db_initial_state['effects']),
+        'time': int(db_initial_state['duration'])
     }
     steps.append(initial_step)
 
@@ -326,7 +345,8 @@ def plan_gantt_actions():
     goal_step = {
         'step_id': int(db_goal_state['action']),  # goal state action id = 2
         'preconditions': goal_conditions,
-        'posteffects': []
+        'posteffects': [],
+        'time': int(db_goal_state['duration'])
     }
     steps.append(goal_step)
 
@@ -378,95 +398,114 @@ def partial_order_planner(plan_problem, goals, actions):
     #   if there is no such action fail -> IMPOSSIBLE PLAN
     #   otherwise update planning problem
     valid_actions = where_contains_effect(actions, current_goal_precondition['name'], current_goal_precondition['value'])
-    if len(valid_actions) == 0:
-        plan_problem['successful'] = False
-        return plan_problem
 
-    selected_action = random.choice(valid_actions)
-
-    if selected_action is None:
-        plan_problem['successful'] = False
-        return plan_problem
-
-    selected_step = next((x for x in plan_problem['steps'] if x['step_id'] == selected_action['action_id']), None)
-    if selected_step is None:
-        selected_step = {
-            'step_id': selected_action['action_id'],
-            'preconditions': selected_action['preconditions'],
-            'posteffects': selected_action['posteffects']
-        }
-        plan_problem['steps'].append(selected_step)
-
-    # Update G
-    goals.remove(current_goal)
-    for precondition in selected_step['preconditions']:
-        new_goal = {
-            'c': precondition,
-            'S': selected_step
-        }
-        goals.append(new_goal)
-
-    # Update O
-    new_order = {
-        'predecessor': selected_step,
-        'successor': current_goal['S']
-    }
-    plan_problem['ordering_constraints'].append(new_order)
-
-    # Update L
-    new_causal_link = {
-        'source': selected_step,
-        'c': current_goal_precondition,
-        'target': current_goal['S']
-    }
-    plan_problem['causal_links'].append(new_causal_link)
-
-    # 4. causal link protection
-    selected_step_posteffects = selected_step['posteffects']
-    for causal_link in causal_links:
-        condition = causal_link['c']
-        source = causal_link['source']
-        target = causal_link['target']
-        is_threat = check_if_threat(condition, selected_step_posteffects)
-        if is_threat:
-            # case 1: DEMOTION -> is threat, but does not depend on source
-            dependencies = conditions_intersection(source['posteffects'], selected_step['preconditions'])
-            if len(dependencies) == 0:
-                protection_order = {
-                    'predecessor': selected_step,
-                    'successor': causal_link['target']
-                }
-                plan_problem['ordering_constraints'].append(protection_order)
-                continue
-
-            # case 2: PROMOTION -> is threat, depends on source, target does not threaten it
-            causal_link_target = causal_link['target']
-
-            constraint_threat = {
-                'name': condition['name'],
-                'value': not condition['value']
-            }
-
-            target_threats_step = any(effect['name'] == constraint_threat['name']
-                                      and effect['value'] == constraint_threat['value'] for effect in
-                                      causal_link_target['posteffects'])
-
-            if not target_threats_step:
-                protection_order = {
-                    'predecessor': causal_link['target'],
-                    'successor': selected_step
-                }
-                plan_problem['ordering_constraints'].append(protection_order)
-                # temp_constraints = [c for c in plan_problem['ordering_constraints']
-                #                     if c['predecessor']['step_id'] != causal_link['source']['step_id']
-                #                     and c['successor']['step_id'] != selected_step['step_id']]
-                #
-                # plan_problem['ordering_constraints'] = temp_constraints
-                continue
-
-            # case 3: IMPOSSIBLE PLAN
+    valid_action_found = False
+    while not valid_action_found:
+        if len(valid_actions) == 0:
             plan_problem['successful'] = False
             return plan_problem
+
+        selected_action = random.choice(valid_actions)
+
+        if selected_action is None:
+            plan_problem['successful'] = False
+            return plan_problem
+
+        selected_step = next((x for x in plan_problem['steps'] if x['step_id'] == selected_action['action_id']), None)
+        if selected_step is None:
+            selected_step = {
+                'step_id': selected_action['action_id'],
+                'preconditions': selected_action['preconditions'],
+                'posteffects': selected_action['posteffects'],
+                'time': selected_action['time']
+            }
+            plan_problem['steps'].append(selected_step)
+
+        # Update G
+        goals.remove(current_goal)
+        new_goals = []
+        for precondition in selected_step['preconditions']:
+            new_goal = {
+                'c': precondition,
+                'S': selected_step
+            }
+            goals.append(new_goal)
+            new_goals.append(new_goal)
+
+        # Update O
+        new_order = {
+            'predecessor': selected_step,
+            'successor': current_goal['S']
+        }
+        plan_problem['ordering_constraints'].append(new_order)
+
+        # Update L
+        new_causal_link = {
+            'source': selected_step,
+            'c': current_goal_precondition,
+            'target': current_goal['S']
+        }
+        plan_problem['causal_links'].append(new_causal_link)
+
+        # 4. causal link protection
+        selected_step_posteffects = selected_step['posteffects']
+        all_causal_links_protected = True
+        for causal_link in causal_links:
+            condition = causal_link['c']
+            source = causal_link['source']
+            is_threat = check_if_threat(condition, selected_step_posteffects)
+            if is_threat:
+                # case 1: DEMOTION -> is threat, but does not depend on source
+                dependencies = conditions_intersection(source['posteffects'], selected_step['preconditions'])
+                if len(dependencies) == 0:
+                    protection_order = {
+                        'predecessor': selected_step,
+                        'successor': causal_link['target']
+                    }
+                    plan_problem['ordering_constraints'].append(protection_order)
+                    continue
+
+                # case 2: PROMOTION -> is threat, depends on source, target does not threaten it
+                causal_link_target = causal_link['target']
+
+                constraint_threat = {
+                    'name': condition['name'],
+                    'value': not condition['value']
+                }
+
+                target_threats_step = any(effect['name'] == constraint_threat['name']
+                                        and effect['value'] == constraint_threat['value'] for effect in
+                                        causal_link_target['posteffects'])
+
+                if not target_threats_step:
+                    protection_order = {
+                        'predecessor': causal_link['target'],
+                        'successor': selected_step
+                    }
+                    plan_problem['ordering_constraints'].append(protection_order)
+                    # temp_constraints = [c for c in plan_problem['ordering_constraints']
+                    #                     if c['predecessor']['step_id'] != causal_link['source']['step_id']
+                    #                     and c['successor']['step_id'] != selected_step['step_id']]
+                    #
+                    # plan_problem['ordering_constraints'] = temp_constraints
+                    continue
+
+                # case 3: IMPOSSIBLE PLAN
+                all_causal_links_protected = False
+                break
+
+                # plan_problem['successful'] = False
+                # return plan_problem
+        if all_causal_links_protected:
+            valid_action_found = True
+        else:
+            valid_actions.remove(selected_action)
+            plan_problem['steps'].remove(selected_step)
+            goals.append(current_goal)
+            for goal in new_goals:
+                goals.remove(goal)
+            plan_problem['ordering_constraints'].remove(new_order)
+            plan_problem['causal_links'].remove(new_causal_link)
 
     # 5. recursively call PoP
     return partial_order_planner(plan_problem, goals, actions)
@@ -559,21 +598,50 @@ def construct_final_order(total_order):
 def construct_gantt_total_order_plan(partial_plan):
     initial_task = db.tasks.find_one({'action': "1"})
     goal_task = db.tasks.find_one({'action': "2"})
+
+    start = datetime.strptime(initial_task['end_date'], '%Y-%m-%d %H:%M')
+    end = datetime.strptime(goal_task['start_date'], '%Y-%m-%d %H:%M')
+
+    plan_duration_minutes = (end - start).total_seconds() / 60.0
+
+    total_steps_duration = 0
     for step in partial_plan['steps']:
+        step_duration = step['time']
+        total_steps_duration += step_duration
+
+    total_order = construct_total_order(partial_plan)
+    final_order = construct_final_order(total_order)
+
+    for step_order in total_order:
+        step = get_step(step_order, partial_plan['steps'])
         if step['step_id'] == 1 or step['step_id'] == 2:
             continue
+
+        step_duration = step['time']
+        step_duration_proportion = step_duration/total_steps_duration
+        total_steps_duration -= step_duration
+
+        start_limit = int(plan_duration_minutes*step_duration_proportion) - step_duration
+        start_minutes = random.randint(0, start_limit)
+
+        start_date = start + timedelta(seconds=start_minutes*60)
+        end_date = start_date + timedelta(seconds=step_duration*60)
+
+        start = end_date
+        plan_duration_minutes = (end - start).total_seconds() / 60.0
+
         step_action = db.actions.find_one({'action_id': step['step_id']})
         task = {
             'taskid': get_next_sequence("taskId"),
             'text': step_action['name'],
-            'start_date': initial_task['start_date'],
-            'end_date': initial_task['end_date'],
+            'start_date': str(start_date),
+            'end_date': str(end_date),
             'holder': "1",
-            'action': str(step_action['action_id']),
+            'action': str(int(step_action['action_id'])),
             'priority': initial_task['priority'],
             'progress': 0.0,
             'parent': initial_task["parent"],
-            'duration': initial_task["duration"],
+            'duration': step['time'],
             'success_rate': initial_task["success_rate"],
             'preconditions': step_action["preconditions"],
             'effects': step_action["posteffect"],
@@ -581,24 +649,11 @@ def construct_gantt_total_order_plan(partial_plan):
         }
         db.tasks.insert(task)
 
-    has_link = []
-    all_tasks = db.tasks.find()
-    for task in all_tasks:
-        task_has_link = {
-            'task_id': task['taskid'],
-            'action_id': int(float(task['action'])),
-            'linked_to': 0,
-            'linked_from': 0
-        }
-        has_link.append(task_has_link)
-
-    total_order = construct_total_order(partial_plan)
-    final_order = construct_final_order(total_order)
     for order in final_order:
         action_from = order['predecessor']
         action_to = order['successor']
-        task_from = db.tasks.find_one({'action': str(action_from)})
-        task_to = db.tasks.find_one({'action': str(action_to)})
+        task_from = db.tasks.find_one({'action': str(int(action_from))})
+        task_to = db.tasks.find_one({'action': str(int(action_to))})
         link = {
             'link_id': get_next_sequence('linkId'),
             'source': int(task_from['taskid']),
@@ -606,10 +661,7 @@ def construct_gantt_total_order_plan(partial_plan):
             'type': "0"
         }
         db.links.insert(link)
-        has_link = update_action_links(has_link, action_to, action_from)
-
-    print(has_link, flush=True)
-    return False
+    return True
 
 
 #endregion

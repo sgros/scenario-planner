@@ -10,13 +10,17 @@ class App extends Component {
             currentZoom: 'Days',
             currentTime: "0",
             actions: [],
-            isFetchingActions: false
+            isFetchingActions: false,
+            isCalculatingPlan: false,
+            planSuccessful: true,
+            planUpdated: false
         }
         this.getGanttActions = this.getGanttActions.bind(this);
+        this.calculatePlan = this.calculatePlan.bind(this);
     }
 
     async getGanttActions(){
-        console.log("Getting Gantt actions");
+        console.log("Getting Gantt actions...");
         this.setState({
             isFetchingActions:true
         })
@@ -29,6 +33,21 @@ class App extends Component {
         });
     }
 
+    async calculatePlan(){
+        console.log("Planning actions...");
+        this.setState({
+            isCalculatingPlan:true
+        })
+        await fetch('http://localhost:8080/gantt/plan').then(res => res.json()).then(data => {
+            this.setState({
+                planSuccessful: data.success,
+                isCalculatingPlan:false,
+                planUpdated: data.success
+            });
+            console.log("Planning is done: ", this.state.planSuccessful);
+        });
+    }
+
     handleZoomChange = (zoom) => {
         console.log("Handling zoom change in app ", zoom);
         this.setState({
@@ -37,7 +56,7 @@ class App extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState){
-        if(nextState.isFetchingActions){
+        if(nextState.isFetchingActions || nextState.isCalculatingPlan){
             return false;
         }
         return true;
@@ -47,10 +66,19 @@ class App extends Component {
         this.getGanttActions();
     }
 
+    componentDidUpdate(prevProps, prevState){
+        if (prevState.planUpdated){
+            this.setState({
+                planUpdated:false
+            });
+        }
+    }
+
     render() {
         console.log("Rendering app.");
         var currentZoom = this.state.currentZoom;
         var ganttActions = this.state.actions;
+        var planUpdated = this.state.planUpdated;
         console.log("Gantt actions: ", ganttActions);
         return (
             <div className="app-container">
@@ -59,12 +87,14 @@ class App extends Component {
                         zoom={currentZoom}
                         onZoomChange={this.handleZoomChange}
                         onActionsUpload={this.getGanttActions}
+                        onCalculatePlan={this.calculatePlan}
                     />
                 </div>
                 <div className="gantt-container">
                     <Gantt
                         zoom={currentZoom}
                         actions={ganttActions}
+                        planUpdated={planUpdated}
                     />
                 </div>
             </div>
