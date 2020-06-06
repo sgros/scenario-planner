@@ -98,7 +98,8 @@ export default class Gantt extends Component {
             { name: "holder", height: 50, map_to:"holder", type:"select",options:this.state.playersLabel},
             { name:"action", height: 50, map_to:"action", type:"select", options:gantt.serverList("actions") },
             { name:"priority", height: 50, map_to:"priority", type:"select", options:this.state.priority },
-            { name: "success_rate", height: 50, map_to:"success_rate", type:"textarea" },
+            {name: "failed", type:"checkbox", map_to: "failed", options:[
+                {key:"step_failed", label:"Step failed"}]},
             { name: "preconditions", height: 50, map_to:"preconditions", type:"textarea" },
             { name: "effects", height: 50, map_to:"effects", type:"textarea" }
         ];
@@ -106,7 +107,7 @@ export default class Gantt extends Component {
         gantt.locale.labels["section_holder"] = "Holder";
         gantt.locale.labels["section_action"] = "Action";
         gantt.locale.labels["section_priority"] = "Priority";
-        gantt.locale.labels["section_success_rate"] = "Success rate";
+        gantt.locale.labels["section_failed"] = "";
         gantt.locale.labels["section_preconditions"] = "Preconditions";
         gantt.locale.labels["section_effects"] = "Effects";
 

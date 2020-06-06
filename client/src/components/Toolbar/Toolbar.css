@@ -52,7 +52,7 @@
 
 .button-right{
     float: right;
-    height: 30px;
+    height: 20px;
     background-color: #a0a0a0;
     border: none;
     color: white;
@@ -60,6 +60,17 @@
     text-decoration: none;
     margin-left: 6px;
     margin-right: 6px;
+    margin-top: 7px;
     display: inline-block;
-    font-size: 16px;
+    font-size: 12px;
+}
+
+.text-right{
+    float: right;
+    height: 20px;
+    border: none;
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+    font-size: 12px;
 }

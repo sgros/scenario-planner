@@ -26,12 +26,6 @@ def root():
     return jsonify({ 'message': message })
 
 
-@app.route('/time')
-@cross_origin()
-def get_current_time():
-    return jsonify({ 'time': time.time() })
-
-
 @app.route('/gantt/plan', methods=['GET'])
 @cross_origin()
 def get_plan():
@@ -43,6 +37,12 @@ def get_plan():
 @app.route('/gantt/task', methods=['POST'])
 @cross_origin()
 def create_task():
+    task_checkboxes = request.form["failed"]
+    task_failed = "task_failed" in task_checkboxes
+    color = 'rgb(61,185,211)'
+    if task_failed:
+        color = 'rgb(245, 66, 87)'
+
     task = {
         'taskid': get_next_sequence("taskId"),
         'text': request.form["text"],
@@ -54,10 +54,10 @@ def create_task():
         'progress': float(request.form["progress"]),
         'parent': request.form["parent"],
         'duration': int(request.form["duration"]),
-        'success_rate': request.form["success_rate"],
+        'failed': task_failed,
         'preconditions': request.form["preconditions"],
         'effects': request.form["effects"],
-        'done': False
+        'color': color
     }
 
     db.tasks.insert(task)
@@ -69,8 +69,11 @@ def create_task():
 def get_tasks():
     mongo_tasks = [task for task in db.tasks.find({})]
     tasks = []
-
     for mongo_task in mongo_tasks:
+        checkboxes = []
+        if mongo_task['failed']:
+            checkboxes.append("step_failed")
+
         task = {
             'id': int(mongo_task['taskid']),
             'text': mongo_task['text'],
@@ -82,10 +85,10 @@ def get_tasks():
             'progress': mongo_task['progress'],
             'duration': mongo_task['duration'],
             'parent': mongo_task['parent'],
-            'success_rate': mongo_task['success_rate'],
+            'failed': checkboxes,
             'preconditions': mongo_task['preconditions'],
             'effects': mongo_task['effects'],
-            'done': mongo_task['done']
+            'color': mongo_task['color']
         }
         tasks.append(task)
 
@@ -107,7 +110,15 @@ def get_tasks():
 @app.route('/gantt/task/<taskId>', methods=['PUT'])
 @cross_origin()
 def update_task(taskId):
-    query = {"taskid": int(float(taskId))}
+    task_checkboxes = request.form["failed"]
+    print(task_checkboxes, flush=True)
+    task_failed = "step_failed" in task_checkboxes
+    print(task_failed, flush=True)
+    color = 'rgb(61,185,211)'
+    if task_failed:
+        color = 'rgb(245, 66, 87)'
+
+    query = {"taskid": int(taskId)}
     values = {"$set": {
         'text': request.form["text"],
         'start_date': request.form["start_date"],
@@ -118,9 +129,10 @@ def update_task(taskId):
         'progress': float(request.form["progress"]),
         'parent': request.form["parent"],
         'duration': int(request.form["duration"]),
-        'success_rate': request.form["success_rate"],
+        'failed': task_failed,
         'preconditions': request.form["preconditions"],
         'effects': request.form["effects"],
+        'color': color
     }}
 
     print(query, flush=True)

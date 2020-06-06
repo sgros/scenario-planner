@@ -94,10 +94,11 @@ export default class Toolbar extends Component {
                         />
                     </MuiThemeProvider>
                     <div className="dropdown-menu" style={{width: '100%' }}>
-                        <button className="button-right" onClick={() => gantt.exportToPNG({raw:true})}>Export to PNG</button>
-                        <button className="button-right" onClick={() => gantt.exportToPDF({raw:true})}>Export to PDF</button>
-                        <button className="button-right" onClick={() => gantt.exportToExcel({raw:true})}>Export to Excel</button>
-                        <button className="button-right" onClick={() => gantt.exportToICal({raw:true})}>Export to iCal</button>
+                        <button className="button-right" onClick={() => gantt.exportToPNG({raw:true})}>PNG</button>
+                        <button className="button-right" onClick={() => gantt.exportToPDF({raw:true})}>PDF</button>
+                        <button className="button-right" onClick={() => gantt.exportToExcel({raw:true})}>Excel</button>
+                        <button className="button-right" onClick={() => gantt.exportToICal({raw:true})}>iCal</button>
+                        <button className="button-right" onClick={() => gantt.exportToJSON({raw:true})}>JSON</button>
                     </div>
                 </div>
             </div>
