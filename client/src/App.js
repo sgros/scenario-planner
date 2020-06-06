@@ -42,7 +42,7 @@ class App extends Component {
             this.setState({
                 planSuccessful: data.success,
                 isCalculatingPlan:false,
-                planUpdated: data.success
+                planUpdated: true
             });
             console.log("Planning is done: ", this.state.planSuccessful);
         });
@@ -79,6 +79,7 @@ class App extends Component {
         var currentZoom = this.state.currentZoom;
         var ganttActions = this.state.actions;
         var planUpdated = this.state.planUpdated;
+        var planSuccessful = this.state.planSuccessful;
         console.log("Gantt actions: ", ganttActions);
         return (
             <div className="app-container">
@@ -95,6 +96,7 @@ class App extends Component {
                         zoom={currentZoom}
                         actions={ganttActions}
                         planUpdated={planUpdated}
+                        planSuccessful={planSuccessful}
                     />
                 </div>
             </div>

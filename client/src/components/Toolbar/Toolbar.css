@@ -52,6 +52,14 @@
 
 .button-right{
     float: right;
+    height: 30px;
+    background-color: #a0a0a0;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
     margin-left: 6px;
     margin-right: 6px;
+    display: inline-block;
+    font-size: 16px;
 }

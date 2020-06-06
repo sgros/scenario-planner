@@ -609,6 +609,9 @@ def construct_gantt_total_order_plan(partial_plan):
         step_duration = step['time']
         total_steps_duration += step_duration
 
+    if total_steps_duration >= plan_duration_minutes:
+        return False
+
     total_order = construct_total_order(partial_plan)
     final_order = construct_final_order(total_order)
 

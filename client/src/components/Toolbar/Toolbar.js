@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import axios, { post } from 'axios';
+import { gantt } from 'dhtmlx-gantt';
 
 export default class Toolbar extends Component {
     handleZoomChange = (e) => {
@@ -84,13 +85,20 @@ export default class Toolbar extends Component {
                         style={{display: 'none'}}
                         onChange={this.handleFileChange.bind(this)}
                     />
-                    <MuiThemeProvider className="button-right">
+                    <MuiThemeProvider>
                         <RaisedButton
+                            className="button-left"
                             label="Import actions"
                             primary={false}
                             onClick={()=>{this.upload.click()}}
                         />
                     </MuiThemeProvider>
+                    <div className="dropdown-menu" style={{width: '100%' }}>
+                        <button className="button-right" onClick={() => gantt.exportToPNG({raw:true})}>Export to PNG</button>
+                        <button className="button-right" onClick={() => gantt.exportToPDF({raw:true})}>Export to PDF</button>
+                        <button className="button-right" onClick={() => gantt.exportToExcel({raw:true})}>Export to Excel</button>
+                        <button className="button-right" onClick={() => gantt.exportToICal({raw:true})}>Export to iCal</button>
+                    </div>
                 </div>
             </div>
         );

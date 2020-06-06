@@ -4,6 +4,7 @@
     <list default="true" id="6c865ef5-44b3-4bf3-8a2d-7b8ab056aaf6" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/components/Gantt/Gantt.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Gantt/Gantt.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" afterDir="false" />
@@ -21,8 +22,8 @@
       <file leaf-file-name="Gantt.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-304">
-              <caret line="128" column="9" selection-start-line="128" selection-start-column="9" selection-end-line="128" selection-end-column="9" />
+            <state relative-caret-position="15">
+              <caret line="1" column="36" lean-forward="true" selection-start-line="1" selection-start-column="22" selection-end-line="1" selection-end-column="36" />
               <folding>
                 <element signature="e#0#8074#0" />
                 <element signature="e#0#8044#0" />
@@ -34,11 +35,29 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="server.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/client/public/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="304">
+              <caret line="29" column="71" selection-start-line="29" selection-start-column="71" selection-end-line="29" selection-end-column="71" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Gantt.css" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="9" column="17" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="server.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="124">
-              <caret line="454" column="42" selection-start-line="454" selection-start-column="42" selection-end-line="454" selection-end-column="42" />
+            <state relative-caret-position="2130">
+              <caret line="603" lean-forward="true" selection-start-line="603" selection-end-line="603" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
                 <element signature="e#367#378#0" />
@@ -50,6 +69,7 @@
                 <element signature="e#4498#4535#0" />
                 <element signature="e#4891#5144#0" />
                 <element signature="e#6825#6838#0" />
+                <element signature="e#10313#15385#0" />
                 <element signature="e#14345#16288#0" />
                 <element signature="e#15492#16158#0" />
                 <element signature="e#16770#17614#0" />
@@ -62,8 +82,8 @@
       <file leaf-file-name="Toolbar.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-12">
-              <caret line="68" column="14" lean-forward="true" selection-start-line="68" selection-start-column="14" selection-end-line="68" selection-end-column="14" />
+            <state relative-caret-position="75">
+              <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
             </state>
           </provider>
         </entry>
@@ -71,8 +91,8 @@
       <file leaf-file-name="App.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/App.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="273">
-              <caret line="50" column="1" selection-start-line="50" selection-start-column="1" selection-end-line="50" selection-end-column="1" />
+            <state relative-caret-position="375">
+              <caret line="25" column="26" selection-start-line="25" selection-start-column="26" selection-end-line="25" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -80,17 +100,17 @@
       <file leaf-file-name="Toolbar.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="366">
-              <caret line="41" column="30" selection-start-line="41" selection-start-column="30" selection-end-line="41" selection-end-column="30" />
+            <state relative-caret-position="247">
+              <caret line="53" column="17" selection-start-line="53" selection-start-column="17" selection-end-line="53" selection-end-column="17" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="App.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="App.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/client/src/App.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="92" column="30" selection-start-line="92" selection-start-column="21" selection-end-line="92" selection-end-column="30" />
+            <state relative-caret-position="660">
+              <caret line="44" column="33" selection-start-line="44" selection-start-column="33" selection-end-line="44" selection-end-column="33" />
             </state>
           </provider>
         </entry>
@@ -115,7 +135,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>showli</find>
       <find>showlight</find>
       <find>dhtmlx</find>
       <find>_dhtmlx_confirm</find>
@@ -143,6 +162,7 @@
       <find>confi</find>
       <find>xml</find>
       <find>timede</find>
+      <find>inline</find>
       <find>remove</find>
       <find>setcol</find>
     </findStrings>
@@ -169,17 +189,18 @@
         <option value="$PROJECT_DIR$/client/src/static/config.json" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/client/node_modules/react-scripts/scripts/build.js" />
-        <option value="$PROJECT_DIR$/client/src/components/Gantt/Gantt.css" />
         <option value="$PROJECT_DIR$/client/src/App.test.js" />
         <option value="$PROJECT_DIR$/client/package.json" />
         <option value="$PROJECT_DIR$/docker-compose.yml" />
         <option value="$PROJECT_DIR$/client/src/index.js" />
-        <option value="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" />
-        <option value="$PROJECT_DIR$/client/src/App.js" />
-        <option value="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" />
         <option value="$PROJECT_DIR$/client/src/App.css" />
-        <option value="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css" />
+        <option value="$PROJECT_DIR$/client/src/App.js" />
         <option value="$PROJECT_DIR$/server/server.py" />
+        <option value="$PROJECT_DIR$/client/src/components/Gantt/Gantt.css" />
+        <option value="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css" />
+        <option value="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" />
+        <option value="$PROJECT_DIR$/client/public/index.html" />
+        <option value="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" />
       </list>
     </option>
   </component>
@@ -209,38 +230,13 @@
               <item name="moonstone-CCS" type="b2602c69:ProjectViewProjectNode" />
               <item name="moonstone-CCS" type="462c0819:PsiDirectoryNode" />
               <item name="client" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="public" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="moonstone-CCS" type="b2602c69:ProjectViewProjectNode" />
               <item name="moonstone-CCS" type="462c0819:PsiDirectoryNode" />
               <item name="client" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="moonstone-CCS" type="b2602c69:ProjectViewProjectNode" />
-              <item name="moonstone-CCS" type="462c0819:PsiDirectoryNode" />
-              <item name="client" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="Gantt" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="moonstone-CCS" type="b2602c69:ProjectViewProjectNode" />
-              <item name="moonstone-CCS" type="462c0819:PsiDirectoryNode" />
-              <item name="client" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="GanttTask" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="moonstone-CCS" type="b2602c69:ProjectViewProjectNode" />
-              <item name="moonstone-CCS" type="462c0819:PsiDirectoryNode" />
-              <item name="client" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="Toolbar" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="moonstone-CCS" type="b2602c69:ProjectViewProjectNode" />
@@ -294,7 +290,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24947146" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -350,11 +345,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/client/node_modules/dhtmlx-gantt/codebase/sources/dhtmlxgantt.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-27897" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/client/node_modules/dhtmlx-gantt/codebase/sources/ext/dhtmlxgantt_tooltip.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-7664" />
@@ -494,13 +484,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="14" selection-start-line="3" selection-start-column="14" selection-end-line="3" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/client/src/serviceWorker.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-891" />
@@ -569,52 +552,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-304">
-          <caret line="128" column="9" selection-start-line="128" selection-start-column="9" selection-end-line="128" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#8074#0" />
-            <element signature="e#0#8044#0" />
-            <element signature="e#0#8074#0" />
-            <element signature="e#0#8074#0" />
-            <element signature="e#0#8074#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/App.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="92" column="30" selection-start-line="92" selection-start-column="21" selection-end-line="92" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-12">
-          <caret line="68" column="14" lean-forward="true" selection-start-line="68" selection-start-column="14" selection-end-line="68" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/client/src/App.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="50" column="1" selection-start-line="50" selection-start-column="1" selection-end-line="50" selection-end-column="1" />
+        <state relative-caret-position="375">
+          <caret line="25" column="26" selection-start-line="25" selection-start-column="26" selection-end-line="25" selection-end-column="26" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="366">
-          <caret line="41" column="30" selection-start-line="41" selection-start-column="30" selection-end-line="41" selection-end-column="30" />
+        <state relative-caret-position="247">
+          <caret line="53" column="17" selection-start-line="53" selection-start-column="17" selection-end-line="53" selection-end-column="17" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="124">
-          <caret line="454" column="42" selection-start-line="454" selection-start-column="42" selection-end-line="454" selection-end-column="42" />
+        <state relative-caret-position="2130">
+          <caret line="603" lean-forward="true" selection-start-line="603" selection-end-line="603" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
             <element signature="e#367#378#0" />
@@ -626,11 +581,54 @@
             <element signature="e#4498#4535#0" />
             <element signature="e#4891#5144#0" />
             <element signature="e#6825#6838#0" />
+            <element signature="e#10313#15385#0" />
             <element signature="e#14345#16288#0" />
             <element signature="e#15492#16158#0" />
             <element signature="e#16770#17614#0" />
             <element signature="e#17414#17725#0" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="17" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/public/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="304">
+          <caret line="29" column="71" selection-start-line="29" selection-start-column="71" selection-end-line="29" selection-end-column="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="36" lean-forward="true" selection-start-line="1" selection-start-column="22" selection-end-line="1" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#8074#0" />
+            <element signature="e#0#8044#0" />
+            <element signature="e#0#8074#0" />
+            <element signature="e#0#8074#0" />
+            <element signature="e#0#8074#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/App.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="660">
+          <caret line="44" column="33" selection-start-line="44" selection-start-column="33" selection-end-line="44" selection-end-column="33" />
         </state>
       </provider>
     </entry>

@@ -21,6 +21,13 @@ export default class Gantt extends Component {
             actionLabel: actionLabel,
             playersLabel: playersLabel
         }
+
+        this.export = this.export.bind(this);
+    }
+
+    export(){
+        console.log("Trying to export.");
+        gantt.exportToPDF();
     }
 
     dataProcessor = null;
@@ -109,6 +116,13 @@ export default class Gantt extends Component {
         gantt.load("http://localhost:8080/gantt");
         this.initGanttDataProcessor();
         this.dataProcessor.init(gantt);
+
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "http://export.dhtmlx.com/gantt/api.js";
+        script.id = "ganttApi";
+        document.body.appendChild(script);
+        document.head.appendChild(script);
     }
 
     componentWillUnmount() {
@@ -121,6 +135,10 @@ export default class Gantt extends Component {
     componentDidUpdate() {
         console.log("Component did update -> gantt.render");
         if (this.props.planUpdated){
+            if (!this.props.planSuccessful){
+                console.log("Error message");
+                gantt.message({type:"error", text:"Impossible to generate a plan for a given set of goals.",expire:10000});
+            }
             console.log("It also loaded tasks.");
             gantt.init(this.ganttContainer);
             gantt.load("http://localhost:8080/gantt");
@@ -190,8 +208,6 @@ export default class Gantt extends Component {
       gantt.config.duration_unit = "minute";
       gantt.config.buttons_left = ["dhx_save_btn", "dhx_cancel_btn", "milestone"];
       gantt.config.buttons_right = ["dhx_delete_btn"];
-
-      //addTodayMarker();
     }
 
     render() {
@@ -201,10 +217,12 @@ export default class Gantt extends Component {
         this.setZoom(zoom);
         console.log("Gantt rendering, zoom set to ", zoom);
         return (
-            <div
-                ref={(input) => { this.ganttContainer = input }}
-                style={{ width: '100%', height: '100%' }}
-            >
+            <div style={{ width: '100%', height: '100%' }}>
+                <div
+                    ref={(input) => { this.ganttContainer = input }}
+                    style={{ width: '100%', height: '100%' }}
+                >
+                </div>
             </div>
         );
     }
