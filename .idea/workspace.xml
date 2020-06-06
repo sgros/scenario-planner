@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6c865ef5-44b3-4bf3-8a2d-7b8ab056aaf6" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,8 +16,8 @@
       <file leaf-file-name="Gantt.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="285">
-              <caret line="100" column="61" selection-start-line="100" selection-start-column="61" selection-end-line="100" selection-end-column="61" />
+            <state relative-caret-position="210">
+              <caret line="95" column="42" selection-start-line="95" selection-start-column="42" selection-end-line="95" selection-end-column="42" />
               <folding>
                 <element signature="e#0#8074#0" />
                 <element signature="e#0#8044#0" />
@@ -32,32 +29,17 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/client/public/index.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="29" column="71" selection-start-line="29" selection-start-column="71" selection-end-line="29" selection-end-column="71" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Gantt.css" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="9" column="17" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="server.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="server.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="31" column="29" selection-start-line="31" selection-start-column="29" selection-end-line="31" selection-end-column="29" />
+            <state relative-caret-position="375">
+              <caret line="447" column="100" selection-start-line="447" selection-start-column="100" selection-end-line="447" selection-end-column="100" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
+                <element signature="e#367#378#0" />
                 <element signature="e#449#618#0" />
+                <element signature="e#1011#1739#0" />
+                <element signature="e#1945#3250#0" />
                 <element signature="e#3925#3961#0" />
                 <element signature="e#4334#4618#0" />
                 <element signature="e#4498#4535#0" />
@@ -65,12 +47,23 @@
                 <element signature="e#3524#4751#0" />
                 <element signature="e#4891#5144#0" />
                 <element signature="e#6825#6838#0" />
-                <element signature="e#7034#7045#0" />
+                <element signature="e#7082#7260#0" />
+                <element signature="e#7142#7420#0" />
+                <element signature="e#7193#7709#0" />
+                <element signature="e#7706#7924#0" />
+                <element signature="e#8000#8296#0" />
+                <element signature="e#8268#8532#0" />
+                <element signature="e#8583#8864#0" />
+                <element signature="e#8901#8981#0" />
+                <element signature="e#9810#10232#0" />
+                <element signature="e#10297#10708#0" />
+                <element signature="e#10763#10901#0" />
+                <element signature="e#10952#11112#0" />
+                <element signature="e#11161#12142#0" />
+                <element signature="e#12189#12500#0" />
                 <element signature="e#10313#15385#0" />
                 <element signature="e#14345#16288#0" />
                 <element signature="e#15492#16158#0" />
-                <element signature="e#16770#17614#0" />
-                <element signature="e#17414#17725#0" />
               </folding>
             </state>
           </provider>
@@ -81,24 +74,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="213">
               <caret line="95" column="76" selection-start-line="95" selection-start-column="76" selection-end-line="95" selection-end-column="76" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="App.css" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/client/src/App.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="25" column="26" selection-start-line="25" selection-start-column="26" selection-end-line="25" selection-end-column="26" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Toolbar.css" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="235">
-              <caret line="62" column="17" selection-start-line="62" selection-start-column="17" selection-end-line="62" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -132,7 +107,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>dhtmlx</find>
       <find>_dhtmlx_confirm</find>
       <find>relati</find>
       <find>loadData</find>
@@ -158,10 +132,11 @@
       <find>confi</find>
       <find>xml</find>
       <find>timede</find>
-      <find>setcol</find>
       <find>remove</find>
-      <find>inline</find>
       <find>red</find>
+      <find>inline</find>
+      <find>setcol</find>
+      <find>find</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -196,9 +171,9 @@
         <option value="$PROJECT_DIR$/client/public/index.html" />
         <option value="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" />
         <option value="$PROJECT_DIR$/server/partial_order_planner.py" />
-        <option value="$PROJECT_DIR$/server/server.py" />
         <option value="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" />
         <option value="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css" />
+        <option value="$PROJECT_DIR$/server/server.py" />
       </list>
     </option>
   </component>
@@ -288,7 +263,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24947146" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -340,7 +314,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="4" />
+      <option name="time" value="9" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -570,48 +544,10 @@
     <entry file="file://$PROJECT_DIR$/server/partial_order_planner.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="100" column="61" selection-start-line="100" selection-start-column="61" selection-end-line="100" selection-end-column="61" />
-          <folding>
-            <element signature="e#0#8074#0" />
-            <element signature="e#0#8044#0" />
-            <element signature="e#0#8074#0" />
-            <element signature="e#0#8074#0" />
-            <element signature="e#0#8074#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/client/src/App.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
           <caret line="25" column="26" selection-start-line="25" selection-start-column="26" selection-end-line="25" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="31" column="29" selection-start-line="31" selection-start-column="29" selection-end-line="31" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#11#0" expanded="true" />
-            <element signature="e#449#618#0" />
-            <element signature="e#3925#3961#0" />
-            <element signature="e#4334#4618#0" />
-            <element signature="e#4498#4535#0" />
-            <element signature="e#4837#4874#0" />
-            <element signature="e#3524#4751#0" />
-            <element signature="e#4891#5144#0" />
-            <element signature="e#6825#6838#0" />
-            <element signature="e#7034#7045#0" />
-            <element signature="e#10313#15385#0" />
-            <element signature="e#14345#16288#0" />
-            <element signature="e#15492#16158#0" />
-            <element signature="e#16770#17614#0" />
-            <element signature="e#17414#17725#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -626,6 +562,58 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="235">
           <caret line="62" column="17" selection-start-line="62" selection-start-column="17" selection-end-line="62" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="95" column="42" selection-start-line="95" selection-start-column="42" selection-end-line="95" selection-end-column="42" />
+          <folding>
+            <element signature="e#0#8074#0" />
+            <element signature="e#0#8044#0" />
+            <element signature="e#0#8074#0" />
+            <element signature="e#0#8074#0" />
+            <element signature="e#0#8074#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="447" column="100" selection-start-line="447" selection-start-column="100" selection-end-line="447" selection-end-column="100" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+            <element signature="e#367#378#0" />
+            <element signature="e#449#618#0" />
+            <element signature="e#1011#1739#0" />
+            <element signature="e#1945#3250#0" />
+            <element signature="e#3925#3961#0" />
+            <element signature="e#4334#4618#0" />
+            <element signature="e#4498#4535#0" />
+            <element signature="e#4837#4874#0" />
+            <element signature="e#3524#4751#0" />
+            <element signature="e#4891#5144#0" />
+            <element signature="e#6825#6838#0" />
+            <element signature="e#7082#7260#0" />
+            <element signature="e#7142#7420#0" />
+            <element signature="e#7193#7709#0" />
+            <element signature="e#7706#7924#0" />
+            <element signature="e#8000#8296#0" />
+            <element signature="e#8268#8532#0" />
+            <element signature="e#8583#8864#0" />
+            <element signature="e#8901#8981#0" />
+            <element signature="e#9810#10232#0" />
+            <element signature="e#10297#10708#0" />
+            <element signature="e#10763#10901#0" />
+            <element signature="e#10952#11112#0" />
+            <element signature="e#11161#12142#0" />
+            <element signature="e#12189#12500#0" />
+            <element signature="e#10313#15385#0" />
+            <element signature="e#14345#16288#0" />
+            <element signature="e#15492#16158#0" />
+          </folding>
         </state>
       </provider>
     </entry>

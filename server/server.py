@@ -30,7 +30,7 @@ def root():
 @cross_origin()
 def get_plan():
     clean_previous_plan_if_exists()
-    result = plan_gantt_actions()
+    result = plan_gantt_actions(1)
     return jsonify({'success': result})
 
 
@@ -138,6 +138,10 @@ def update_task(taskId):
     print(query, flush=True)
     print(values, flush=True)
     db.tasks.find_one_and_update(query, values)
+
+    if task_failed:
+        recalculate_plan()
+
     return jsonify({"action": "updated"})
 
 
@@ -273,6 +277,7 @@ def parse_conditions(conditions):
         conditions.append(condition)
     return conditions
 
+
 def check_if_threat(condition, posteffects):
     is_threat = False
     for posteffect in posteffects:
@@ -320,13 +325,140 @@ def get_step(action_id, steps):
             return step
 
 
+def get_recursive_predecessors(order_constraints, step_id):
+    recursive_predecessors = []
+    direct_predecessors = [c['predecessor']['step_id'] for c in order_constraints
+                           if c['successor']['step_id'] == step_id]
+    recursive_predecessors.extend(direct_predecessors)
+    for pred in direct_predecessors:
+        preds = get_recursive_predecessors(order_constraints, pred)
+        recursive_predecessors.extend(preds)
+
+    return set(recursive_predecessors)
+
+
+def get_recursive_successors(order_constraints, step_id):
+    recursive_successors = []
+    direct_predecessors = [c['successor']['step_id'] for c in order_constraints
+                           if c['predecessor']['step_id'] == step_id]
+    recursive_successors.extend(direct_predecessors)
+    for pred in direct_predecessors:
+        preds = get_recursive_successors(order_constraints, pred)
+        recursive_successors.extend(preds)
+    return set(recursive_successors)
+
+
+def max_predecessor(total_order, predecessors):
+    max_pred = 0
+    for i in range(len(total_order)):
+        if total_order[i] in predecessors:
+            max_pred = i
+    return max_pred
+
+
+def min_successor(total_order, successors):
+    min_suc = len(total_order)-1
+    for i in reversed(range(len(total_order))):
+        if total_order[i] in successors:
+            min_suc = i
+    return min_suc
+
+
+def construct_total_order(partial_order):
+    total_order = []
+    i = 0
+    for step in partial_order['steps']:
+        if len(total_order) < 2:
+            total_order.append(step['step_id'])
+            continue
+        predecessors = get_recursive_predecessors(partial_order['ordering_constraints'], step['step_id'])
+        successors = get_recursive_successors(partial_order['ordering_constraints'], step['step_id'])
+        min_i = max_predecessor(total_order, predecessors)
+        max_i = min_successor(total_order, successors)
+        if min_i > max_i:
+            print("There has been an error!", flush=True)
+            print(step['step_id'], flush=True)
+            print(total_order, flush=True)
+            print(predecessors, flush=True)
+            print(successors, flush=True)
+        index = 0
+        if min_i == max_i or min_i+1==max_i:
+            index = max_i
+        else:
+            index = random.randint(min_i + 1, max_i)
+        total_order.insert(index, step['step_id'])
+
+    return total_order
+
+
+def construct_final_order(total_order):
+    final_order = []
+    order_max_i = len(total_order)
+    for i in range(len(total_order)):
+        if i + 1 < order_max_i:
+            order = {
+                'predecessor': total_order[i],
+                'successor': total_order[i+1]
+            }
+            final_order.append(order)
+    return final_order
+
+
+#endregion
+
+
+#region recalculation
+
+def clean_after_failed_action():
+    print("Cleaning...", flush=True)
+    failed_task = db.tasks.find_one({'failed':True})
+    deleted_tasks = []
+    deleted_links = []
+    print(failed_task, flush=True)
+    all_tasks_found = False
+    current_failed_task = failed_task
+
+    while not all_tasks_found:
+        link_to_next = db.links.find_one({'source': current_failed_task['taskid']})
+        print(link_to_next, flush=True)
+        next_failed_task_id = link_to_next['target']
+        next_failed_task = db.tasks.find_one({'taskid': next_failed_task_id})
+        deleted_links.append(link_to_next)
+        if next_failed_task['action'] == "2":
+            all_tasks_found = True
+        else:
+            deleted_tasks.append(next_failed_task)
+            current_failed_task = next_failed_task
+
+    print(deleted_tasks, flush=True)
+    print(deleted_links, flush=True)
+    for task in deleted_tasks:
+        db.tasks.remove({'taskid': task['taskid']})
+    for link in deleted_links:
+        db.links.remove({'link_id': link['link_id']})
+
+    max_task_index = db.tasks.find().sort('taskid', -1).limit(1)
+    max_link_index = db.links.find().sort('link_id', -1).limit(1)
+
+    print(max_task_index, flush=True)
+    print(max_link_index, flush=True)
+    for max_task in max_task_index:
+        db.counters.find_and_modify({"_id": 'taskId'}, {"$set": {"sequence_value": max_task['taskid']}})
+    for max_link in max_link_index:
+        db.counters.find_and_modify({"_id": 'linkId'}, {"$set": {"sequence_value": max_link['link_id']}})
+
+
+def recalculate_plan():
+    failed_task = db.tasks.find_one({'failed': True})
+    clean_after_failed_action()
+
 #endregion
 
 
 #region PoP
 
 
-def plan_gantt_actions():
+def plan_gantt_actions(initial_action):
     causal_links = []
     ordering_constraints = []
     steps = []
@@ -343,7 +475,7 @@ def plan_gantt_actions():
         }
         actions.append(action)
 
-    db_initial_state = db.tasks.find_one({'action': "1"})
+    db_initial_state = db.tasks.find_one({'action': str(initial_action)})
     initial_step = {
         'step_id': int(db_initial_state['action']),  # initial state action id = 1
         'preconditions': [],
@@ -379,7 +511,7 @@ def plan_gantt_actions():
     plan = partial_order_planner(plan_problem, goals, actions)
     db.partial_plans.insert(plan)
     if plan['successful']:
-        return construct_gantt_total_order_plan(plan)
+        return construct_gantt_total_order_plan(plan, initial_action)
     return False
 
 
@@ -528,87 +660,8 @@ def partial_order_planner(plan_problem, goals, actions):
 #region Gantt Plan
 
 
-def get_recursive_predecessors(order_constraints, step_id):
-    recursive_predecessors = []
-    direct_predecessors = [c['predecessor']['step_id'] for c in order_constraints
-                           if c['successor']['step_id'] == step_id]
-    recursive_predecessors.extend(direct_predecessors)
-    for pred in direct_predecessors:
-        preds = get_recursive_predecessors(order_constraints, pred)
-        recursive_predecessors.extend(preds)
-
-    return set(recursive_predecessors)
-
-
-def get_recursive_successors(order_constraints, step_id):
-    recursive_successors = []
-    direct_predecessors = [c['successor']['step_id'] for c in order_constraints
-                           if c['predecessor']['step_id'] == step_id]
-    recursive_successors.extend(direct_predecessors)
-    for pred in direct_predecessors:
-        preds = get_recursive_successors(order_constraints, pred)
-        recursive_successors.extend(preds)
-    return set(recursive_successors)
-
-
-def max_predecessor(total_order, predecessors):
-    max_pred = 0
-    for i in range(len(total_order)):
-        if total_order[i] in predecessors:
-            max_pred = i
-    return max_pred
-
-
-def min_successor(total_order, successors):
-    min_suc = len(total_order)-1
-    for i in reversed(range(len(total_order))):
-        if total_order[i] in successors:
-            min_suc = i
-    return min_suc
-
-
-def construct_total_order(partial_order):
-    total_order = []
-    i = 0
-    for step in partial_order['steps']:
-        if len(total_order) < 2:
-            total_order.append(step['step_id'])
-            continue
-        predecessors = get_recursive_predecessors(partial_order['ordering_constraints'], step['step_id'])
-        successors = get_recursive_successors(partial_order['ordering_constraints'], step['step_id'])
-        min_i = max_predecessor(total_order, predecessors)
-        max_i = min_successor(total_order, successors)
-        if min_i > max_i:
-            print("There has been an error!", flush=True)
-            print(step['step_id'], flush=True)
-            print(total_order, flush=True)
-            print(predecessors, flush=True)
-            print(successors, flush=True)
-        index = 0
-        if min_i == max_i or min_i+1==max_i:
-            index = max_i
-        else:
-            index = random.randint(min_i + 1, max_i)
-        total_order.insert(index, step['step_id'])
-
-    return total_order
-
-
-def construct_final_order(total_order):
-    final_order = []
-    order_max_i = len(total_order)
-    for i in range(len(total_order)):
-        if i + 1 < order_max_i:
-            order = {
-                'predecessor': total_order[i],
-                'successor': total_order[i+1]
-            }
-            final_order.append(order)
-    return final_order
-
-
-def construct_gantt_total_order_plan(partial_plan):
-    initial_task = db.tasks.find_one({'action': "1"})
+def construct_gantt_total_order_plan(partial_plan, initial_action):
+    initial_task = db.tasks.find_one({'action': str(initial_action)})
     goal_task = db.tasks.find_one({'action': "2"})
 
     start = datetime.strptime(initial_task['end_date'], '%Y-%m-%d %H:%M')
@@ -657,10 +710,10 @@ def construct_gantt_total_order_plan(partial_plan):
             'progress': 0.0,
             'parent': initial_task["parent"],
             'duration': step['time'],
-            'success_rate': initial_task["success_rate"],
             'preconditions': step_action["preconditions"],
             'effects': step_action["posteffect"],
-            'done': False
+            'failed': False,
+            'color': 'rgb(61,185,211)'
         }
         db.tasks.insert(task)
 
