@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6c865ef5-44b3-4bf3-8a2d-7b8ab056aaf6" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/client/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/client/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/App.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/server.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/server.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,15 +19,11 @@
       <file leaf-file-name="Gantt.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="348">
-              <caret line="71" column="31" lean-forward="true" selection-start-line="71" selection-start-column="31" selection-end-line="71" selection-end-column="31" />
+            <state relative-caret-position="218">
+              <caret line="198" column="58" selection-start-line="198" selection-start-column="17" selection-end-line="198" selection-end-column="58" />
               <folding>
                 <element signature="e#0#8074#0" />
-                <element signature="e#0#8890#0" />
                 <element signature="e#0#8044#0" />
-                <element signature="e#0#8074#0" />
-                <element signature="e#0#8074#0" />
-                <element signature="e#0#8074#0" />
               </folding>
             </state>
           </provider>
@@ -36,12 +32,11 @@
       <file leaf-file-name="server.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19">
-              <caret line="284" lean-forward="true" selection-start-line="284" selection-end-line="284" />
+            <state relative-caret-position="-1615">
+              <caret line="32" selection-start-line="32" selection-end-line="32" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
                 <element signature="e#449#618#0" />
-                <element signature="e#3349#4790#0" />
                 <element signature="e#3925#3961#0" />
                 <element signature="e#4891#5144#0" />
                 <element signature="e#7082#7260#0" />
@@ -75,10 +70,22 @@
       <file leaf-file-name="App.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/client/src/App.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1050">
-              <caret line="82" column="5" selection-start-line="82" selection-start-column="5" selection-end-line="82" selection-end-column="5" />
+            <state relative-caret-position="251">
+              <caret line="137" column="90" selection-start-line="137" selection-start-column="90" selection-end-line="137" selection-end-column="90" />
               <folding>
                 <element signature="e#0#2057#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/client/public/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="450">
+              <caret line="30" column="48" selection-start-line="30" selection-start-column="48" selection-end-line="30" selection-end-column="48" />
+              <folding>
+                <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -131,9 +138,9 @@
       <find>minute</find>
       <find>strptime</find>
       <find>planCleared</find>
-      <find>planUpdated</find>
       <find>isCalculatingPlan</find>
       <find>iscal</find>
+      <find>planUpdated</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -164,12 +171,12 @@
         <option value="$PROJECT_DIR$/client/src/index.js" />
         <option value="$PROJECT_DIR$/client/src/App.css" />
         <option value="$PROJECT_DIR$/client/src/components/Gantt/Gantt.css" />
-        <option value="$PROJECT_DIR$/client/public/index.html" />
         <option value="$PROJECT_DIR$/server/partial_order_planner.py" />
         <option value="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.css" />
         <option value="$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js" />
         <option value="$PROJECT_DIR$/server/server.py" />
         <option value="$PROJECT_DIR$/client/src/components/Gantt/Gantt.js" />
+        <option value="$PROJECT_DIR$/client/public/index.html" />
         <option value="$PROJECT_DIR$/client/src/App.js" />
       </list>
     </option>
@@ -261,6 +268,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24947146" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -518,13 +526,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/public/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="29" column="71" selection-start-line="29" selection-start-column="71" selection-end-line="29" selection-end-column="71" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -549,14 +550,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="626">
+          <caret line="48" column="42" selection-start-line="48" selection-start-column="27" selection-end-line="48" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server/server.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="284" lean-forward="true" selection-start-line="284" selection-end-line="284" />
+        <state relative-caret-position="-1615">
+          <caret line="32" selection-start-line="32" selection-end-line="32" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
             <element signature="e#449#618#0" />
-            <element signature="e#3349#4790#0" />
             <element signature="e#3925#3961#0" />
             <element signature="e#4891#5144#0" />
             <element signature="e#7082#7260#0" />
@@ -577,32 +584,31 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
+    <entry file="file://$PROJECT_DIR$/client/public/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="348">
-          <caret line="71" column="31" lean-forward="true" selection-start-line="71" selection-start-column="31" selection-end-line="71" selection-end-column="31" />
+        <state relative-caret-position="450">
+          <caret line="30" column="48" selection-start-line="30" selection-start-column="48" selection-end-line="30" selection-end-column="48" />
           <folding>
-            <element signature="e#0#8074#0" />
-            <element signature="e#0#8890#0" />
-            <element signature="e#0#8044#0" />
-            <element signature="e#0#8074#0" />
-            <element signature="e#0#8074#0" />
-            <element signature="e#0#8074#0" />
+            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/src/components/Toolbar/Toolbar.js">
+    <entry file="file://$PROJECT_DIR$/client/src/components/Gantt/Gantt.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="626">
-          <caret line="48" column="42" selection-start-line="48" selection-start-column="27" selection-end-line="48" selection-end-column="42" />
+        <state relative-caret-position="218">
+          <caret line="198" column="58" selection-start-line="198" selection-start-column="17" selection-end-line="198" selection-end-column="58" />
+          <folding>
+            <element signature="e#0#8074#0" />
+            <element signature="e#0#8044#0" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client/src/App.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1050">
-          <caret line="82" column="5" selection-start-line="82" selection-start-column="5" selection-end-line="82" selection-end-column="5" />
+        <state relative-caret-position="251">
+          <caret line="137" column="90" selection-start-line="137" selection-start-column="90" selection-end-line="137" selection-end-column="90" />
           <folding>
             <element signature="e#0#2057#0" />
           </folding>

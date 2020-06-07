@@ -12,14 +12,7 @@ export default class Gantt extends Component {
 
         this.configSetup();
 
-        var actionLabel = this.loadActions();
-        var priorityList = this.loadPriorities();
-        var playersLabel = this.loadPlayers();
-
         this.state = {
-            priority: priorityList,
-            actionLabel: actionLabel,
-            playersLabel: playersLabel,
             planRecalculated: false
         }
     }
@@ -80,6 +73,7 @@ export default class Gantt extends Component {
     componentDidMount() {
         gantt.config.xml_date = "%Y-%m-%d %H:%i";
         gantt.config.show_links = true;
+        gantt.config.autofit = true;
 
         this.setColumns();
 
@@ -112,18 +106,14 @@ export default class Gantt extends Component {
         var task_sections = [
             { name: "description", height: 50, map_to: "text", type: "textarea", focus: true },
             { name: "time", height: 72, type: "time", map_to: "auto", time_format:["%d","%m","%Y","%H:%i"] },
-            { name: "holder", height: 50, map_to:"holder", type:"select",options:this.state.playersLabel},
             { name:"action", height: 50, map_to:"action", type:"select", options:gantt.serverList("actions") },
-            { name:"priority", height: 50, map_to:"priority", type:"select", options:this.state.priority },
             {name: "failed", type:"checkbox", map_to: "failed", options:[
                 {key:"step_failed", label:"Step failed"}]},
             { name: "preconditions", height: 50, map_to:"preconditions", type:"textarea" },
             { name: "effects", height: 50, map_to:"effects", type:"textarea" }
         ];
 
-        gantt.locale.labels["section_holder"] = "Holder";
         gantt.locale.labels["section_action"] = "Action";
-        gantt.locale.labels["section_priority"] = "Priority";
         gantt.locale.labels["section_failed"] = "";
         gantt.locale.labels["section_preconditions"] = "Preconditions";
         gantt.locale.labels["section_effects"] = "Effects";
@@ -171,43 +161,6 @@ export default class Gantt extends Component {
             this.dataProcessor.init(gantt);
         }
         gantt.render();
-    }
-
-    loadActions(){
-        var actionLabel = [];
-        var keys = Object.keys(jsonAction.actions);
-        $.each(keys, function(i, val) {
-            actionLabel.push({"key": i, "label": val})
-        });
-
-        return actionLabel;
-    }
-
-    loadPriorities(){
-        var priorityList = [];
-        var priorities = "";
-        $.each(jsonTimestamp.priority, function(i, val) {
-            priorityList.push({"key": i, "label": val})
-            priorities += ";{ key:" + i + ", label:" + val +"}";
-        });
-        for(let r in priorityList){$('#priority').append($('<option>',{value: r,text: priorityList[r]}))}
-
-        gantt.locale.labels["PriorityList"] = priorities;
-        return priorityList;
-    }
-
-    loadPlayers(){
-        var playersLabel = [];
-        var cpt = 0;
-        $.each(jsonStateLevelScenario.players, function(i, val) {
-            $.each(val.actors, function(y, val2) {
-                playersLabel.push({"key": cpt, "label": i + "." + val2.name})
-                cpt++;
-            })
-        });
-        for(let r in playersLabel){$('#holder').append($('<option>',{value: r,text: playersLabel[r]["label"]}))}
-
-        return playersLabel;
     }
 
     setColumns(){

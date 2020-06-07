@@ -135,7 +135,7 @@ class App extends Component {
                         onProjectImport={this.handleProjectImport}
                     />
                 </div>
-                <div className="gantt-container">
+                <div className="gantt-container" style={{ width: '100%', height: '100%' }}>
                     <Gantt
                         zoom={currentZoom}
                         actions={ganttActions}
