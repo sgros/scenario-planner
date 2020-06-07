@@ -89,7 +89,6 @@ def get_tasks():
             'action': mongo_task['action'],
             'priority': mongo_task['priority'],
             'progress': mongo_task['progress'],
-            'duration': mongo_task['duration'],
             'parent': mongo_task['parent'],
             'failed': checkboxes,
             'preconditions': mongo_task['preconditions'],
@@ -175,8 +174,8 @@ def delete_task(taskId):
 def add_link():
     link = {
         "link_id": get_next_sequence("linkId"),
-        "source": int(float(request.form['source'])),
-        "target": int(float(request.form['target'])),
+        "source": int(request.form['source']),
+        "target": int(request.form['target']),
         "type": str(int(request.form['type']))
     }
     db.links.insert(link)
@@ -188,8 +187,8 @@ def add_link():
 def update_link(linkId):
     query = {"link_id": int(linkId)}
     values = {"$set": {
-        "source": int(float(request.form['source'])),
-        "target": int(float(request.form['target'])),
+        "source": int(request.form['source']),
+        "target": int(request.form['target']),
         "type": str(int(request.form['type']))
     }}
     db.links.find_one_and_update(query, values)
@@ -199,7 +198,7 @@ def update_link(linkId):
 @app.route('/gantt/link/<linkId>', methods=['DELETE'])
 @cross_origin()
 def delete_link(linkId):
-    query = {"link_id":int(linkId)}
+    query = {"link_id": int(linkId)}
     db.links.remove(query)
     return jsonify({"action": "deleted"})
 
@@ -257,6 +256,72 @@ def get_actions():
         }
         actions.append(action)
     return jsonify({"actions": actions})
+
+
+@app.route('/gantt/clear')
+def clear_gantt_chart():
+    sem.acquire()
+    clear_chart()
+    sem.release()
+    return jsonify({'project_cleared': True})
+
+
+@app.route('/gantt/import', methods=['POST'])
+def import_existing_project():
+    sem.acquire()
+    data = request.get_json()
+    gantt_data = data['data']
+    project_data = gantt_data['data']
+    tasks = project_data['data']
+    links = project_data['links']
+    clear_chart()
+
+    for task in tasks:
+        task_checkboxes = task["failed"]
+        task_failed = "task_failed" in task_checkboxes
+        color = 'rgb(61,185,211)'
+        if task_failed:
+            color = 'rgb(245, 66, 87)'
+
+        start = datetime.strptime(task['start_date'], '%d-%m-%Y %H:%M')
+        end = datetime.strptime(task['end_date'], '%d-%m-%Y %H:%M')
+
+        start_date = start.strftime('%Y-%m-%d %H:%M')
+        end_date = end.strftime('%Y-%m-%d %H:%M')
+
+        new_task = {
+            'taskid': int(get_next_sequence("taskId")),
+            'text': task["text"],
+            'start_date': start_date,
+            'end_date': end_date,
+            'holder': task["holder"],
+            'action': task["action"],
+            'priority': task["priority"],
+            'progress': float(task["progress"]),
+            'parent': task["parent"],
+            'duration': int(task["duration"]),
+            'failed': task_failed,
+            'preconditions': task["preconditions"],
+            'effects': task["effects"],
+            'color': color,
+            'fail_handled': False
+        }
+
+        db.tasks.insert(new_task)
+
+    for link in links:
+        new_link = {
+            "link_id": get_next_sequence("linkId"),
+            "source": int(link['source']),
+            "target": int(link['target']),
+            "type": str(int(link['type']))
+        }
+        db.links.insert(new_link)
+
+    sem.release()
+    return jsonify({'project_imported': True})
+
+
 #endregion
 
 
@@ -267,6 +332,14 @@ def get_next_sequence(name):
     if sequence is None:
         return 0
     return sequence.get('sequence_value')
+
+
+def clear_chart():
+    db.tasks.remove({})
+    db.links.remove({})
+    db.partial_plans.remove({})
+    db.counters.find_and_modify({"_id": 'linkId'}, {"$set": {"sequence_value": 0}})
+    db.counters.find_and_modify({"_id": 'taskId'}, {"$set": {"sequence_value": 0}})
 
 
 def clean_previous_plan_if_exists():

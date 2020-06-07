@@ -19,15 +19,9 @@ export default class Gantt extends Component {
         this.state = {
             priority: priorityList,
             actionLabel: actionLabel,
-            playersLabel: playersLabel
+            playersLabel: playersLabel,
+            planRecalculated: false
         }
-
-        this.export = this.export.bind(this);
-    }
-
-    export(){
-        console.log("Trying to export.");
-        gantt.exportToPDF();
     }
 
     dataProcessor = null;
@@ -74,10 +68,11 @@ export default class Gantt extends Component {
         }
     }
 
-    shouldComponentUpdate(nextProps) {
+    shouldComponentUpdate(nextProps, nextState) {
+        console.log(nextProps);
         var actionsUpdated = this.props.actions.length !== nextProps.actions.length;
         var zoomUpdated = this.props.zoom !== nextProps.zoom;
-        var planUpdated = nextProps.planUpdated;
+        var planUpdated = nextProps.planUpdated || nextState.planRecalculated || nextProps.planCleared || nextProps.projectImported;
 
         return actionsUpdated || zoomUpdated || planUpdated;
     }
@@ -87,6 +82,28 @@ export default class Gantt extends Component {
         gantt.config.show_links = true;
 
         this.setColumns();
+
+        var taskUpdateHandler = function(id,item){
+            console.log(item.failed);
+            if (item.failed.includes('step_failed')){
+                setTimeout(() => {
+                    this.setState({
+                        planRecalculated: true
+                    });
+                }, 200);
+
+            }
+        }.bind(this);
+
+        gantt.attachEvent("onAfterTaskUpdate", taskUpdateHandler);
+
+        gantt.attachEvent("onLoadStart", function(){
+            gantt.message({id:"calculating", type:"warning", text:"Recalculating plan...", expire:300});
+        });
+
+        gantt.attachEvent("onLoadEnd", function(){
+            gantt.message.hide("calculating");
+        });
 
         gantt.serverList("actions", [
             {key:1, label:"Initial state"}
@@ -135,11 +152,17 @@ export default class Gantt extends Component {
 
     componentDidUpdate() {
         console.log("Component did update -> gantt.render");
-        if (this.props.planUpdated){
-            if (!this.props.planSuccessful){
+        if (this.props.planUpdated || this.state.planRecalculated || this.props.planCleared || this.props.projectImported){
+            if (!this.props.planSuccessful && (!this.state.planRecalculated && !this.props.planCleared && !this.props.projectImported)){
                 console.log("Error message");
-                gantt.message({type:"error", text:"Impossible to generate a plan for a given set of goals.",expire:10000});
+                gantt.message({type:"error", text:"Impossible to generate a plan for a given set of goals.",expire:5000});
             }
+            if (this.state.planRecalculated){
+                this.setState({
+                    planRecalculated: false
+                });
+            }
+
             console.log("It also loaded tasks.");
             gantt.init(this.ganttContainer);
             gantt.clearAll();
@@ -203,12 +226,13 @@ export default class Gantt extends Component {
       gantt.config.auto_scheduling = true;
       gantt.config.autoscroll_speed = 100;
       gantt.config.fit_tasks = true;
-      gantt.config.duration_unit = "hour";
       gantt.config.scale_height = 50;
       gantt.config.min_column_width = 100;
       gantt.config.open_tree_initially = true;
       gantt.config.duration_unit = "minute";
-      gantt.config.buttons_left = ["dhx_save_btn", "dhx_cancel_btn", "milestone"];
+      gantt.config.time_step = 1;
+      gantt.config.round_dnd_dates = false;
+      gantt.config.buttons_left = ["dhx_save_btn", "dhx_cancel_btn"];
       gantt.config.buttons_right = ["dhx_delete_btn"];
     }
 

@@ -13,10 +13,22 @@ class App extends Component {
             isFetchingActions: false,
             isCalculatingPlan: false,
             planSuccessful: true,
-            planUpdated: false
+            planUpdated: false,
+            isClearingPlan: false,
+            planCleared: false,
+            projectImported: false
         }
         this.getGanttActions = this.getGanttActions.bind(this);
         this.calculatePlan = this.calculatePlan.bind(this);
+        this.clearPlan = this.clearPlan.bind(this);
+        this.handleProjectImport = this.handleProjectImport.bind(this);
+    }
+
+    handleProjectImport(){
+        console.log("Importing project.")
+        this.setState({
+            projectImported: true
+        });
     }
 
     async getGanttActions(){
@@ -48,6 +60,21 @@ class App extends Component {
         });
     }
 
+    async clearPlan(){
+        console.log("Clearing plan...");
+        this.setState({
+            isClearingPlan:true
+        })
+        await fetch('http://localhost:8080/gantt/clear').then(res => res.json()).then(data => {
+            this.setState({
+                isClearingPlan: false,
+                planCleared: true
+            });
+            console.log("Clearing is done");
+        });
+    }
+
+
     handleZoomChange = (zoom) => {
         console.log("Handling zoom change in app ", zoom);
         this.setState({
@@ -56,7 +83,8 @@ class App extends Component {
     }
 
     shouldComponentUpdate(nextProps, nextState){
-        if(nextState.isFetchingActions || nextState.isCalculatingPlan){
+        console.log(nextState);
+        if(nextState.isFetchingActions || nextState.isCalculatingPlan || nextState.isClearingPlan){
             return false;
         }
         return true;
@@ -72,6 +100,18 @@ class App extends Component {
                 planUpdated:false
             });
         }
+
+        if (prevState.planCleared){
+            this.setState({
+                planCleared:false
+            });
+        }
+
+        if (prevState.projectImported){
+            this.setState({
+                projectImported: false
+            });
+        }
     }
 
     render() {
@@ -80,6 +120,8 @@ class App extends Component {
         var ganttActions = this.state.actions;
         var planUpdated = this.state.planUpdated;
         var planSuccessful = this.state.planSuccessful;
+        var planCleared = this.state.planCleared;
+        var projectImported = this.state.projectImported;
         console.log("Gantt actions: ", ganttActions);
         return (
             <div className="app-container">
@@ -89,6 +131,8 @@ class App extends Component {
                         onZoomChange={this.handleZoomChange}
                         onActionsUpload={this.getGanttActions}
                         onCalculatePlan={this.calculatePlan}
+                        onClearPlan={this.clearPlan}
+                        onProjectImport={this.handleProjectImport}
                     />
                 </div>
                 <div className="gantt-container">
@@ -97,6 +141,8 @@ class App extends Component {
                         actions={ganttActions}
                         planUpdated={planUpdated}
                         planSuccessful={planSuccessful}
+                        planCleared={planCleared}
+                        projectImported={projectImported}
                     />
                 </div>
             </div>

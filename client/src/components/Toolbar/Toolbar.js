@@ -24,6 +24,13 @@ export default class Toolbar extends Component {
         }
     }
 
+    clearPlan(){
+        console.log("Will trigger props method for plan calculation.");
+        if (this.props.onClearPlan){
+            this.props.onClearPlan()
+        }
+    }
+
     handleFileChange = async (e) => {
         console.log("Handling file change");
         var fileChanged = await this.onChangeFile(e);
@@ -31,6 +38,16 @@ export default class Toolbar extends Component {
         if (fileChanged){
             console.log("File changed!");
             this.importGanttActions();
+        }
+    }
+
+    handleProjectFileChange = async (e) => {
+        console.log("Importing existing project.");
+        var projectImported = await this.onProjectImport(e);
+        if (projectImported){
+            if (this.props.onProjectImport){
+                this.props.onProjectImport();
+            }
         }
     }
 
@@ -48,6 +65,28 @@ export default class Toolbar extends Component {
                 console.log("Loaded data, should import now.");
                 // send loaded data to server to save in database
                 const url = "http://localhost:8080/actions/import";
+                const formData = { data: loaded_data };
+                var postResult = post(url, formData)
+                    .then(response => resolve(true));
+            }
+            reader.readAsText(file);
+        });
+    }
+
+    async onProjectImport(event) {
+        return new Promise((resolve, reject) => {
+            var file = event.target.files[0];
+            console.log(file);
+            if (file === 'undefined'){
+                resolve(false);
+            }
+            var reader = new FileReader();
+
+            reader.onload = (e) => {
+                var loaded_data = JSON.parse(e.target.result);
+                console.log("Loaded data, should import now.");
+                // send loaded data to server to save in database
+                const url = "http://localhost:8080/gantt/import";
                 const formData = { data: loaded_data };
                 var postResult = post(url, formData)
                     .then(response => resolve(true));
@@ -79,6 +118,9 @@ export default class Toolbar extends Component {
                     <button className="button-left" onClick={() => this.calculatePlan()}>
                         Calculate plan
                     </button>
+                    <button className="button-left" onClick={() => this.clearPlan()}>
+                        Clear
+                    </button>
                     <input id="myInput"
                         type="file"
                         ref={(ref) => this.upload = ref}
@@ -89,6 +131,20 @@ export default class Toolbar extends Component {
                         <RaisedButton
                             className="button-left"
                             label="Import actions"
+                            primary={false}
+                            onClick={()=>{this.upload.click()}}
+                        />
+                    </MuiThemeProvider>
+                    <input id="myInputPlan"
+                        type="file"
+                        ref={(ref) => this.upload = ref}
+                        style={{display: 'none'}}
+                        onChange={this.handleProjectFileChange.bind(this)}
+                    />
+                    <MuiThemeProvider>
+                        <RaisedButton
+                            className="button-left"
+                            label="Import project"
                             primary={false}
                             onClick={()=>{this.upload.click()}}
                         />
