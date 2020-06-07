@@ -6,6 +6,8 @@ from bson import json_util
 from flask_cors import CORS
 from datetime import datetime, timedelta
 import random
+import threading
+
 
 app = Flask(__name__)
 client = MongoClient('mongo', 27017)
@@ -13,7 +15,7 @@ db = client.db
 CORS(app)
 
 app.config['CORS_HEADERS'] = 'Content-Type'
-
+sem = threading.Semaphore()
 
 #region API
 
@@ -29,8 +31,10 @@ def root():
 @app.route('/gantt/plan', methods=['GET'])
 @cross_origin()
 def get_plan():
+    sem.acquire()
     clean_previous_plan_if_exists()
     result = plan_gantt_actions(1)
+    sem.release()
     return jsonify({'success': result})
 
 
@@ -44,7 +48,7 @@ def create_task():
         color = 'rgb(245, 66, 87)'
 
     task = {
-        'taskid': get_next_sequence("taskId"),
+        'taskid': int(get_next_sequence("taskId")),
         'text': request.form["text"],
         'start_date': request.form["start_date"],
         'end_date': request.form["end_date"],
@@ -57,7 +61,8 @@ def create_task():
         'failed': task_failed,
         'preconditions': request.form["preconditions"],
         'effects': request.form["effects"],
-        'color': color
+        'color': color,
+        'fail_handled': False
     }
 
     db.tasks.insert(task)
@@ -67,6 +72,7 @@ def create_task():
 @app.route('/gantt', methods=['GET'])
 @cross_origin()
 def get_tasks():
+    sem.acquire()
     mongo_tasks = [task for task in db.tasks.find({})]
     tasks = []
     for mongo_task in mongo_tasks:
@@ -103,20 +109,30 @@ def get_tasks():
             'type': str(mongo_link['type'])
         }
         links.append(link)
-
+    sem.release()
     return json_util.dumps({'data': tasks, 'links': links})
 
 
 @app.route('/gantt/task/<taskId>', methods=['PUT'])
 @cross_origin()
 def update_task(taskId):
+    sem.acquire()
     task_checkboxes = request.form["failed"]
-    print(task_checkboxes, flush=True)
     task_failed = "step_failed" in task_checkboxes
     print(task_failed, flush=True)
     color = 'rgb(61,185,211)'
+    fail_will_be_handled = False
     if task_failed:
         color = 'rgb(245, 66, 87)'
+        preconditions = ""
+        effects = get_recursive_effects(taskId)
+        fail_will_be_handled = True
+    else:
+        preconditions = request.form["preconditions"]
+        effects = request.form["effects"]
+
+    snapshot = db.tasks.find_one({'taskid': int(taskId)})
+    fail_handled = snapshot['fail_handled']
 
     query = {"taskid": int(taskId)}
     values = {"$set": {
@@ -130,18 +146,19 @@ def update_task(taskId):
         'parent': request.form["parent"],
         'duration': int(request.form["duration"]),
         'failed': task_failed,
-        'preconditions': request.form["preconditions"],
-        'effects': request.form["effects"],
-        'color': color
+        'preconditions': preconditions,
+        'effects': effects,
+        'color': color,
+        'fail_handled': fail_will_be_handled
     }}
 
     print(query, flush=True)
     print(values, flush=True)
     db.tasks.find_one_and_update(query, values)
 
-    if task_failed:
-        recalculate_plan()
-
+    if task_failed and not fail_handled:
+        recalculate_plan(int(taskId))
+    sem.release()
     return jsonify({"action": "updated"})
 
 
@@ -371,6 +388,8 @@ def construct_total_order(partial_order):
         if len(total_order) < 2:
             total_order.append(step['step_id'])
             continue
+        if step['step_id'] in total_order:
+            continue
         predecessors = get_recursive_predecessors(partial_order['ordering_constraints'], step['step_id'])
         successors = get_recursive_successors(partial_order['ordering_constraints'], step['step_id'])
         min_i = max_predecessor(total_order, predecessors)
@@ -404,23 +423,49 @@ def construct_final_order(total_order):
     return final_order
 
 
+def get_recursive_effects(task_id):
+    effects = []
+    current_task_id = int(task_id)
+    while True:
+        if current_task_id == 1:
+            break
+        last_link = db.links.find_one({'target':current_task_id})
+        predecessor = db.tasks.find_one({'taskid': last_link['source']})
+        predecessor_effects = parse_conditions(predecessor['effects'])
+        for predecessor_effect in predecessor_effects:
+            effect_exists = True in (effect['name'] == predecessor_effect['name'] for effect in effects)
+            if not effect_exists:
+                effects.append(predecessor_effect)
+
+        if predecessor['failed']:
+            break
+        current_task_id = predecessor['taskid']
+
+    effect_strings = []
+    for effect in effects:
+        effect_string = effect['name'] + " = " + str(effect['value'])
+        effect_strings.append(effect_string)
+
+    delimiter = "; "
+    step_effects = delimiter.join(effect_strings)
+    return step_effects
+
+
 #endregion
 
 
 #region recalculation
 
-def clean_after_failed_action():
-    print("Cleaning...", flush=True)
-    failed_task = db.tasks.find_one({'failed':True})
+def clean_after_failed_action(failed_task):
     deleted_tasks = []
     deleted_links = []
-    print(failed_task, flush=True)
     all_tasks_found = False
     current_failed_task = failed_task
 
+    db.partial_plans.remove({})
+
     while not all_tasks_found:
         link_to_next = db.links.find_one({'source': current_failed_task['taskid']})
-        print(link_to_next, flush=True)
         next_failed_task_id = link_to_next['target']
         next_failed_task = db.tasks.find_one({'taskid': next_failed_task_id})
         deleted_links.append(link_to_next)
@@ -430,8 +475,6 @@ def clean_after_failed_action():
             deleted_tasks.append(next_failed_task)
             current_failed_task = next_failed_task
 
-    print(deleted_tasks, flush=True)
-    print(deleted_links, flush=True)
     for task in deleted_tasks:
         db.tasks.remove({'taskid': task['taskid']})
     for link in deleted_links:
@@ -440,17 +483,19 @@ def clean_after_failed_action():
     max_task_index = db.tasks.find().sort('taskid', -1).limit(1)
     max_link_index = db.links.find().sort('link_id', -1).limit(1)
 
-    print(max_task_index, flush=True)
-    print(max_link_index, flush=True)
     for max_task in max_task_index:
         db.counters.find_and_modify({"_id": 'taskId'}, {"$set": {"sequence_value": max_task['taskid']}})
     for max_link in max_link_index:
         db.counters.find_and_modify({"_id": 'linkId'}, {"$set": {"sequence_value": max_link['link_id']}})
 
+    print("Done cleaning irrelevant tasks.", flush=True)
 
-def recalculate_plan():
-    failed_task = db.tasks.find_one({'failed': True})
-    clean_after_failed_action()
+
+def recalculate_plan(failed_task_id):
+    failed_task = db.tasks.find_one({'taskid':failed_task_id})
+    clean_after_failed_action(failed_task)
+    plan_gantt_actions(int(failed_task['action']))
+
 
 #endregion
 
@@ -465,7 +510,30 @@ def plan_gantt_actions(initial_action):
     goals = []
     actions = []
     db_actions = db.actions.find()
+
+    # handling recalculation
+    db_current_tasks = db.tasks.find()
+    used_actions = []
+    for task in db_current_tasks:
+        action = int(task['action'])
+        used_actions.append(action)
+
     for db_action in db_actions:
+        if db_action['action_id'] == initial_action:
+            initial_task = db.tasks.find_one({'action': str(initial_action)})
+            action = {
+                'action_id': db_action['action_id'],
+                'name': db_action['name'],
+                'preconditions': parse_conditions(initial_task['preconditions']),
+                'posteffects': parse_conditions(initial_task['effects']),
+                'time': int(db_action['time'])
+            }
+            actions.append(action)
+            continue
+
+        action_exists = True in [used_action_id == db_action['action_id'] for used_action_id in used_actions]
+        if action_exists and db_action['action_id'] != 2 and db_action['action_id'] != initial_action:
+            continue
         action = {
             'action_id': db_action['action_id'],
             'name': db_action['name'],
@@ -535,6 +603,7 @@ def partial_order_planner(plan_problem, goals, actions):
             contains_contradiction = True
 
     if contains_contradiction:
+        print("Contains contradiction.", flush=True)
         plan_problem['successful'] = False
         return plan_problem
 
@@ -546,12 +615,14 @@ def partial_order_planner(plan_problem, goals, actions):
     valid_action_found = False
     while not valid_action_found:
         if len(valid_actions) == 0:
+            print("No valid actions.", flush=True)
             plan_problem['successful'] = False
             return plan_problem
 
         selected_action = random.choice(valid_actions)
 
         if selected_action is None:
+            print("Selected action is None.", flush=True)
             plan_problem['successful'] = False
             return plan_problem
 
@@ -680,9 +751,13 @@ def construct_gantt_total_order_plan(partial_plan, initial_action):
     total_order = construct_total_order(partial_plan)
     final_order = construct_final_order(total_order)
 
+    step_added = []
     for step_order in total_order:
         step = get_step(step_order, partial_plan['steps'])
-        if step['step_id'] == 1 or step['step_id'] == 2:
+        if step['step_id'] == initial_action or step['step_id'] == 2:
+            continue
+
+        if step['step_id'] in step_added:
             continue
 
         step_duration = step['time']
@@ -713,9 +788,11 @@ def construct_gantt_total_order_plan(partial_plan, initial_action):
             'preconditions': step_action["preconditions"],
             'effects': step_action["posteffect"],
             'failed': False,
-            'color': 'rgb(61,185,211)'
+            'color': 'rgb(61,185,211)',
+            'fail_handled': False
         }
         db.tasks.insert(task)
+        step_added.append(step['step_id'])
 
     for order in final_order:
         action_from = order['predecessor']

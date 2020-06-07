@@ -142,6 +142,7 @@ export default class Gantt extends Component {
             }
             console.log("It also loaded tasks.");
             gantt.init(this.ganttContainer);
+            gantt.clearAll();
             gantt.load("http://localhost:8080/gantt");
             this.initGanttDataProcessor();
             this.dataProcessor.init(gantt);
