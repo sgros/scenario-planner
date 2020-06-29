@@ -774,8 +774,6 @@ def partial_order_planner(plan_problem, goals, actions):
                 all_causal_links_protected = False
                 break
 
-                # plan_problem['successful'] = False
-                # return plan_problem
         if all_causal_links_protected:
             valid_action_found = True
         else:
